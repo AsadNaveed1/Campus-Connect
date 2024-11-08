@@ -1,15 +1,9 @@
-import React, { useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import React from "react";
 import { Text, View } from "react-native";
-import { getAuth } from '../../firebase';
+import { useAuthContext } from "../../contexts/AuthContext";
 
 export default function Home() {
-  const [signedIn, setSignedIn] = useState(false);
-  const auth = getAuth();
-
-  onAuthStateChanged(auth, (user) => {
-    setSignedIn(!!user);
-  });
+  const user = useAuthContext();
 
   return (
     <View
@@ -19,7 +13,7 @@ export default function Home() {
         alignItems: "center",
       }}
     >
-      {signedIn ? (
+      {user ? (
         <Text>This is your homepage.</Text>
       ) : (
         <Text>Sign-in to see your personalised homepage.</Text>

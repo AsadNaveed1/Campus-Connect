@@ -1,24 +1,18 @@
 import React, { useState } from "react";
 import { Alert, View, TextInput, StyleSheet, Text, Button } from "react-native";
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
-import { getAuth } from '../../firebase';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { useAuthContext } from '../../contexts/AuthContext';
 
 export default function Auth() {
+  const user = useAuthContext();
   const auth = getAuth();
-
-  const [user, setUser] = useState(null);
-  const [name, setName] = useState("");
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  onAuthStateChanged(auth, (user) => {
-    setUser(user);
-  });
 
   const handleSignup = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(auth.currentUser, { displayName: name });
       Alert.alert("Account created!");
     } catch (error) {
       Alert.alert("Error: ", error.message);
@@ -47,7 +41,7 @@ export default function Auth() {
     <View style={styles.container}>
       {user ? (
         <>
-          <Text style={styles.title}>Welcome, {user.displayName}!</Text>
+          <Text style={styles.title}>Welcome!</Text>
           <View style={styles.buttonContainer}>
             <View style={styles.buttonWrapper}>
               <Button title="Logout" onPress={handleLogout} color="#FF0000" />
@@ -56,15 +50,6 @@ export default function Auth() {
         </>
       ) : (
         <>
-          <Text style={styles.title}>Welcome</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
-            value={name}
-            onChangeText={setName}
-            autoCapitalize="words"
-            placeholderTextColor="#aaa"
-          />
           <TextInput
             style={styles.input}
             placeholder="Email"
