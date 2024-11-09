@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Alert, View, TextInput, StyleSheet, Text, Button } from "react-native";
+import { View, StyleSheet, ToastAndroid } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text, Button, TextInput } from "react-native-paper";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useAuthContext } from '../../contexts/AuthContext';
 
@@ -9,75 +11,76 @@ export default function Auth() {
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const handleSignup = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      Alert.alert("Account created!");
+      ToastAndroid.show("Account created!", ToastAndroid.SHORT);
     } catch (error) {
-      Alert.alert("Error: ", error.message);
+      ToastAndroid.show("Error: " + error.message, ToastAndroid.SHORT);
     }
   };
-
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert("Logged in!");
+      ToastAndroid.show("Logged in!", ToastAndroid.SHORT);
     } catch (error) {
-      Alert.alert("Error: ", error.message);
+      ToastAndroid.show("Error: " + error.message, ToastAndroid.SHORT);
     }
   };
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      Alert.alert("Logged out!");
+      ToastAndroid.show("Logged out!", ToastAndroid.SHORT);
     } catch (error) {
-      Alert.alert("Error: ", error.message);
+      ToastAndroid.show("Error: " + error.message, ToastAndroid.SHORT);
     }
   };
-
   return (
-    <View style={styles.container}>
-      {user ? (
-        <>
-          <Text style={styles.title}>Welcome!</Text>
-          <View style={styles.buttonContainer}>
-            <View style={styles.buttonWrapper}>
-              <Button title="Logout" onPress={handleLogout} color="#FF0000" />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        {user ? (
+          <>
+            <Text variant="headlineMedium" style={styles.title}>Welcome!</Text>
+            <Button mode="contained" onPress={handleLogout} buttonColor="#ED0000">
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <TextInput
+              style={styles.input}
+              mode="outlined"
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              placeholderTextColor="#aaa"
+              outlineColor="#ccc"
+            />
+            <TextInput
+              style={styles.input}
+              mode="outlined"
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+              placeholderTextColor="#aaa"
+              outlineColor="#ccc"
+            />
+            <View style={styles.buttonContainer}>
+              <Button mode="contained" onPress={handleSignup}>
+                Signup
+              </Button>
+              <Button mode="contained" onPress={handleLogin}>
+                Login
+              </Button>
             </View>
-          </View>
-        </>
-      ) : (
-        <>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            placeholderTextColor="#aaa"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholderTextColor="#aaa"
-          />
-          <View style={styles.buttonContainer}>
-            <View style={styles.buttonWrapper}>
-              <Button title="Signup" onPress={handleSignup} color="#007BFF" />
-            </View>
-            <View style={styles.buttonWrapper}>
-              <Button title="Login" onPress={handleLogin} color="#007BFF" />
-            </View>
-          </View>
-        </>
-      )}
-    </View>
+          </>
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -90,30 +93,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
     marginBottom: 24,
     color: "#333",
   },
   input: {
-    width: "100%",
-    padding: 12,
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    backgroundColor: "#fff",
+    width: "80%",
+    marginVertical: 3,
   },
   buttonContainer: {
-    width: "100%",
+    width: "80%",
     marginTop: 24,
     flexDirection: "row",
-    justifyContent: "center",
-  },
-  buttonWrapper: {
-    flex: 1,
-    marginHorizontal: 8,
-    borderRadius: 8,
-    overflow: 'hidden',
+    justifyContent: "space-between",
   },
 });
