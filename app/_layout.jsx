@@ -2,6 +2,7 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { Provider as PaperProvider } from "react-native-paper";
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'react-native';
 
 const lightTheme = {
   colors: {
@@ -98,6 +99,7 @@ export default function RootLayout() {
     <AuthProvider>
       <PaperProvider theme={lightTheme}>
         <SafeAreaProvider>
+          <StatusBar barStyle="dark-content" backgroundColor={lightTheme.colors.background} />
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="register" options={{ headerShown: false }} />
