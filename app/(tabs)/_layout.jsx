@@ -21,7 +21,6 @@ export default function TabLayout() {
       screenOptions={{
         tabBarStyle: [styles.tabBar, { backgroundColor: colors.surface, borderTopColor: 'transparent' }],
         tabBarPosition: 'bottom',
-        animation: 'shift',
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.onSurface,
         tabBarShowLabel: false,

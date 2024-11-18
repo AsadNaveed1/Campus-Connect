@@ -5,11 +5,15 @@ import { Text, Button, TextInput, useTheme } from "react-native-paper";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { doc, setDoc } from 'firebase/firestore';
+import { useUserContext } from "../contexts/UserContext";
+import { firebaseDB } from "../firebaseConfig";
 
 export default function Register() {
   const auth = getAuth();
   const router = useRouter();
   const theme = useTheme();
+  const user = useUserContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSigningUp, setIsSigningUp] = useState(false);
@@ -44,7 +48,16 @@ export default function Register() {
 
   const handleSignup = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userData = {
+        name: name,
+        bio: bio,
+        email: user.email
+      };
+
+      await setDoc(doc(firebaseDB, "users", user.email), userData);
       ToastAndroid.show("Account created", ToastAndroid.SHORT);
       router.back();
     } catch (error) {
