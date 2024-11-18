@@ -1,15 +1,17 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, StyleSheet, ToastAndroid } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button } from "react-native-paper";
+import { Text, Button, useTheme } from "react-native-paper";
 import { getAuth, signOut } from 'firebase/auth';
 import { useAuthContext } from '../../contexts/AuthContext';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function Profile() {
   const user = useAuthContext();
   const auth = getAuth();
+  const router = useRouter();
+  const theme = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -20,48 +22,37 @@ export default function Profile() {
     }
   };
 
+  const handleSignIn = () => {
+    router.push('/register');
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-          padding: 24,
-        }}
-      >
-        <Text variant="headlineMedium" style={{ fontWeight: 'bold' }}>Profile</Text>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            width: '100%',
-          }}
-        >
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <View style={styles.container}>
+        <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.onBackground }]}>Profile</Text>
+        <View style={styles.content}>
           {user ? (
             <>
-              <Text variant="titleMedium" style={styles.title}>Welcome!</Text>
+              <Text variant="titleMedium" style={[styles.welcome, { color: theme.colors.onBackground }]}>Welcome!</Text>
               <Button
                 mode="contained"
                 onPress={handleLogout}
-                buttonColor="#ED0000"
-                icon={() => <Ionicons name="exit-outline" size={24} color="white" />}
+                style={[styles.logoutButton, { backgroundColor: theme.colors.error }]}
+                icon={() => <Ionicons name="exit-outline" size={24} color={theme.colors.onError} />}
               >
                 Logout
               </Button>
             </>
           ) : (
             <>
-              <Text variant="bodyMedium" style={{ marginBottom: 20 }}>Sign-in to see your profile.</Text>
-              <Link replace href="/register" asChild>
-                <Button
-                  mode="contained"
-                  icon={() => <Ionicons name="person-circle-outline" size={24} color="white" />}
-                >
-                  Sign-in
-                </Button>
-              </Link>
+              <Text variant="bodyMedium" style={[styles.signInPrompt, { color: theme.colors.onBackground }]}>Sign-in to see your profile.</Text>
+              <Button
+                mode="contained"
+                onPress={handleSignIn}
+                icon={() => <Ionicons name="person-circle-outline" size={24} color={theme.colors.onPrimary} />}
+              >
+                Sign-in
+              </Button>
             </>
           )}
         </View>
@@ -71,8 +62,28 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    padding: 24,
+  },
   title: {
+    fontWeight: 'bold',
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: '100%',
+  },
+  welcome: {
     marginBottom: 24,
-    color: "#333",
+  },
+  signInPrompt: {
+    marginBottom: 20,
+  },
+  logoutButton: {
+    marginTop: 16,
   },
 });

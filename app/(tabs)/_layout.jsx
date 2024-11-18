@@ -19,10 +19,11 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { backgroundColor: colors.surface, borderTopColor: 'transparent' }],
         tabBarPosition: 'bottom',
         animation: 'shift',
         tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.onSurface,
         tabBarShowLabel: false,
         tabBarIconStyle: styles.tabBarIcon,
       }}
@@ -75,8 +76,8 @@ const styles = StyleSheet.create({
     width: '90%',
     marginHorizontal: '5%',
     borderRadius: 15,
-    backgroundColor: 'rgba(255, 255, 255, 1)',
     elevation: 10,
+    borderTopWidth: 0,
   },
   tabBarIcon: {
     marginTop: 10,
