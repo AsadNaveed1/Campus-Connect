@@ -3,18 +3,18 @@ import { UserProvider } from "../contexts/UserContext";
 import { Provider as PaperProvider } from "react-native-paper";
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar } from 'react-native';
+import { StatusBar, useColorScheme } from 'react-native';
 import { lightTheme, darkTheme } from '../theme';
 
 export default function RootLayout() {
-  const isDarkMode = false;
+  const colorScheme = useColorScheme();
 
   return (
     <AuthProvider>
       <UserProvider>
-        <PaperProvider theme={isDarkMode ? darkTheme : lightTheme}>
+        <PaperProvider theme={colorScheme === 'dark' ? darkTheme : lightTheme}>
           <SafeAreaProvider>
-            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={isDarkMode ? darkTheme.colors.background : lightTheme.colors.background} />
+            <StatusBar barStyle={colorScheme === 'dark' ? "light-content" : "dark-content"} backgroundColor={colorScheme === 'dark' ? darkTheme.colors.background : lightTheme.colors.background} />
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="register" options={{ headerShown: false }} />
