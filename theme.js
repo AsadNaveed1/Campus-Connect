@@ -18,7 +18,7 @@ export const lightTheme = {
     onErrorContainer: "rgb(65, 0, 2)",
     background: "rgb(250, 245, 255)",
     onBackground: "rgb(28, 27, 31)",
-    surface: "rgb(255, 251, 255)",
+    surface: "rgb(255, 255, 255)",
     onSurface: "rgb(28, 27, 31)",
     surfaceVariant: "rgb(229, 224, 236)",
     onSurfaceVariant: "rgb(72, 69, 79)",

@@ -1,46 +1,55 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { firebaseAuth, firebaseDB } from '../firebaseConfig';
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUserState] = useState(null);
+
+  const setUser = (userData) => {
+    setUserState(userData);
+  };
 
   useEffect(() => {
-    const loadUserData = async (user) => {
-      try {
-        const userDoc = await getDoc(doc(firebaseDB, "users", user.email));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          await AsyncStorage.setItem('user', JSON.stringify(userData));
+    let unsubscribeFromUserDoc = null;
+
+    const subscribeToUserDoc = (email) => {
+      const userDocRef = doc(firebaseDB, "users", email);
+      unsubscribeFromUserDoc = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          const userData = doc.data();
           setUser(userData);
+        } else {
+          setUser(null);
         }
-      } catch (error) {
-        console.error("Failed to load user data from Firestore", error);
-      }
+      }, (error) => {
+        console.error("Failed to subscribe to user document", error);
+      });
     };
 
-    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
+    const unsubscribeFromAuth = onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
-        const storedUser = await AsyncStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        } else {
-          await loadUserData(user);
-        }
+        subscribeToUserDoc(user.email);
       } else {
         setUser(null);
+        if (unsubscribeFromUserDoc) {
+          unsubscribeFromUserDoc();
+        }
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribeFromUserDoc) {
+        unsubscribeFromUserDoc();
+      }
+      unsubscribeFromAuth();
+    };
   }, []);
 
   return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );

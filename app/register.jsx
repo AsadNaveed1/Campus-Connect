@@ -5,7 +5,7 @@ import { Text, Button, TextInput, useTheme } from "react-native-paper";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { useUserContext } from "../contexts/UserContext";
 import { firebaseDB } from "../firebaseConfig";
 
@@ -13,16 +13,26 @@ export default function Register() {
   const auth = getAuth();
   const router = useRouter();
   const theme = useTheme();
-  const user = useUserContext();
+  const { setUser } = useUserContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
+  const [degree, setDegree] = useState("");
+  const [major, setMajor] = useState("");
+  const [year, setYear] = useState("");
+  const [universityID, setUniversityID] = useState("");
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userDoc = await getDoc(doc(firebaseDB, "users", user.email));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setUser(userData);
+      }
       ToastAndroid.show("Logged in", ToastAndroid.SHORT);
       router.back();
     } catch (error) {
@@ -54,10 +64,14 @@ export default function Register() {
       const userData = {
         name: name,
         bio: bio,
-        email: user.email
+        degree: degree,
+        major: major,
+        year: year,
+        universityID: universityID
       };
 
       await setDoc(doc(firebaseDB, "users", user.email), userData);
+      setUser(userData);
       ToastAndroid.show("Account created", ToastAndroid.SHORT);
       router.back();
     } catch (error) {
@@ -118,6 +132,46 @@ export default function Register() {
                   value={bio}
                   multiline={true}
                   onChangeText={setBio}
+                  placeholderTextColor={theme.colors.placeholder}
+                  outlineColor={theme.colors.outline}
+                  theme={{ roundness: 15 }}
+                />
+                <TextInput
+                  style={styles.input}
+                  mode="outlined"
+                  label="Degree"
+                  value={degree}
+                  onChangeText={setDegree}
+                  placeholderTextColor={theme.colors.placeholder}
+                  outlineColor={theme.colors.outline}
+                  theme={{ roundness: 15 }}
+                />
+                <TextInput
+                  style={styles.input}
+                  mode="outlined"
+                  label="Major"
+                  value={major}
+                  onChangeText={setMajor}
+                  placeholderTextColor={theme.colors.placeholder}
+                  outlineColor={theme.colors.outline}
+                  theme={{ roundness: 15 }}
+                />
+                <TextInput
+                  style={styles.input}
+                  mode="outlined"
+                  label="Year"
+                  value={year}
+                  onChangeText={setYear}
+                  placeholderTextColor={theme.colors.placeholder}
+                  outlineColor={theme.colors.outline}
+                  theme={{ roundness: 15 }}
+                />
+                <TextInput
+                  style={styles.input}
+                  mode="outlined"
+                  label="University ID"
+                  value={universityID}
+                  onChangeText={setUniversityID}
                   placeholderTextColor={theme.colors.placeholder}
                   outlineColor={theme.colors.outline}
                   theme={{ roundness: 15 }}
