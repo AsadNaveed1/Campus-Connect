@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ToastAndroid, Image } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, Card, useTheme } from "react-native-paper";
+import { Text, Button, useTheme } from "react-native-paper";
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,10 +32,10 @@ export default function Profile() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.container}>
-        <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.onBackground }]}>Profile</Text>
+        <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>Profile</Text>
         {user && (
-          <Card style={[styles.idCard, { backgroundColor: theme.colors.surface }]}>
-            <Card.Content>
+          <View style={[styles.idCard, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.cardContent}>
               <View style={styles.cardHeader}>
                 <Text variant="titleLarge" style={[styles.name, { color: theme.colors.onSurface }]}>{user.name}</Text>
                 <Image
@@ -44,15 +44,16 @@ export default function Profile() {
                 />
               </View>
               <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>{user.bio}</Text>
-            </Card.Content>
-          </Card>
+            </View>
+          </View>
         )}
         <View style={styles.content}>
           {user ? (
             <Button
               mode="contained"
               onPress={handleLogout}
-              style={[styles.logoutButton, { backgroundColor: theme.colors.error }]}
+              style={[styles.logoutButton, { backgroundColor: '#FF0000' }]}
+              labelStyle={{ color: '#FFFFFF' }}
               icon={() => <Ionicons name="exit-outline" size={24} color={theme.colors.onError} />}
             >
               Logout
@@ -92,9 +93,11 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 15,
     borderRadius: 10,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: '#CDCDCD',
+    elevation: 7,
+    padding: 16,
+  },
+  cardContent: {
+    flex: 1,
   },
   cardHeader: {
     flexDirection: 'row',
