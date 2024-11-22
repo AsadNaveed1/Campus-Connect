@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, Text, IconButton, Chip } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
 import SocietyCard from "../../components/SocietyCard";
 import MySocietyCard from "../../components/MySocietyCard";
@@ -17,20 +17,20 @@ export default function Societies() {
   const scrollViewRef = useRef(null);
 
   useEffect(() => {
-    const unsubscribeCategories = onSnapshot(collection(firebaseDB, "categories"), (querySnapshot) => {
+    const categoriesQuery = query(collection(firebaseDB, "categories"), orderBy("name", "asc"));
+    const unsubscribeCategories = onSnapshot(categoriesQuery, (querySnapshot) => {
       const categoriesData = {};
       querySnapshot.docs.forEach(doc => {
         categoriesData[doc.id] = doc.data();
       });
-      const sortedCategories = Object.values(categoriesData).sort((a, b) => a.name.localeCompare(b.name));
       setCategories(categoriesData);
-      setChips(sortedCategories);
+      setChips(Object.values(categoriesData));
     });
 
-    const unsubscribeSocieties = onSnapshot(collection(firebaseDB, "societies"), (querySnapshot) => {
+    const societiesQuery = query(collection(firebaseDB, "societies"), orderBy("name", "asc"));
+    const unsubscribeSocieties = onSnapshot(societiesQuery, (querySnapshot) => {
       const societiesData = querySnapshot.docs.map(doc => doc.data());
-      const sortedSocieties = societiesData.sort((a, b) => a.name.localeCompare(b.name));
-      setSocieties(sortedSocieties);
+      setSocieties(societiesData);
     });
 
     return () => {
@@ -42,7 +42,7 @@ export default function Societies() {
   const handleChipPress = (chipName) => {
     if (chipName === selectedChip) {
       setSelectedChip(null);
-      setChips(Object.values(categories).sort((a, b) => a.name.localeCompare(b.name))); // Reset chips to original order
+      setChips(Object.values(categories));
     } else {
       setSelectedChip(chipName);
       setChips(prevChips => [

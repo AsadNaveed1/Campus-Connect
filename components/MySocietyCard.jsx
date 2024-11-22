@@ -3,7 +3,7 @@ import { View, Image, StyleSheet, Pressable } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { useRouter } from 'expo-router';
 
-export default function MySocietyCard({ logo, name }) {
+export default function MySocietyCard(props) {
   const theme = useTheme();
   const router = useRouter();
 
@@ -23,9 +23,9 @@ export default function MySocietyCard({ logo, name }) {
       ]}
     >
       <View style={styles.logoContainer}>
-        <Image source={logo} style={styles.logo} resizeMode="contain" />
+        <Image source={props.logo} style={styles.logo} resizeMode="contain" />
       </View>
-      <Text style={[styles.name, { color: theme.colors.onSurface }]}>{name}</Text>
+      <Text style={[styles.name, { color: theme.colors.onSurface }]}>{props.name}</Text>
     </Pressable>
   );
 }
