@@ -22,13 +22,15 @@ export default function Societies() {
       querySnapshot.docs.forEach(doc => {
         categoriesData[doc.id] = doc.data();
       });
+      const sortedCategories = Object.values(categoriesData).sort((a, b) => a.name.localeCompare(b.name));
       setCategories(categoriesData);
-      setChips(Object.values(categoriesData));
+      setChips(sortedCategories);
     });
 
     const unsubscribeSocieties = onSnapshot(collection(firebaseDB, "societies"), (querySnapshot) => {
       const societiesData = querySnapshot.docs.map(doc => doc.data());
-      setSocieties(societiesData);
+      const sortedSocieties = societiesData.sort((a, b) => a.name.localeCompare(b.name));
+      setSocieties(sortedSocieties);
     });
 
     return () => {
@@ -40,7 +42,7 @@ export default function Societies() {
   const handleChipPress = (chipName) => {
     if (chipName === selectedChip) {
       setSelectedChip(null);
-      setChips(Object.values(categories)); // Reset chips to original order
+      setChips(Object.values(categories).sort((a, b) => a.name.localeCompare(b.name))); // Reset chips to original order
     } else {
       setSelectedChip(chipName);
       setChips(prevChips => [
@@ -98,21 +100,23 @@ export default function Societies() {
               );
             })}
         </ScrollView>
-        {societies.map(society => {
-          const category = categories[society.category];
-          return (
-            <SocietyCard
-              key={society.name}
-              style={styles.card}
-              name={society.name}
-              members={`${society.members}`}
-              category={category ? category.name : ''}
-              categoryColor={category ? `#${category.backgroundColor}` : 'lightcoral'}
-              categoryTextColor={category ? `#${category.textColor}` : 'white'}
-              logoUrl={{ uri: society.logo }}
-            />
-          );
-        })}
+        {societies
+          .filter(society => !selectedChip || categories[society.category]?.name === selectedChip)
+          .map(society => {
+            const category = categories[society.category];
+            return (
+              <SocietyCard
+                key={society.name}
+                style={styles.card}
+                name={society.name}
+                members={`${society.members}`}
+                category={category ? category.name : ''}
+                categoryColor={category ? `#${category.backgroundColor}` : 'lightcoral'}
+                categoryTextColor={category ? `#${category.textColor}` : 'white'}
+                logoUrl={{ uri: society.logo }}
+              />
+            );
+          })}
       </ScrollView>
     </SafeAreaView>
   );
@@ -139,7 +143,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   horizontalScroll: {
-    paddingBottom: 20,
+    marginBottom: 28,
   },
   card: {
     marginRight: 16,

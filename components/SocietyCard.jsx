@@ -38,11 +38,11 @@ export default function SocietyCard(props) {
 const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 25,
-    elevation: 5,
+    elevation: 2,
     flexDirection: "row",
     padding: 10,
     alignItems: "center",
-    marginVertical: 8,
+    marginVertical: 4,
   },
   logoContainer: {
     width: 80,
