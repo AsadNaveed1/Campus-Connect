@@ -1,17 +1,32 @@
 import React from "react";
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, Pressable } from "react-native";
 import { Text, useTheme } from "react-native-paper";
+import { useRouter } from 'expo-router';
 
 export default function MySocietyCard({ logo, name }) {
   const theme = useTheme();
+  const router = useRouter();
+
+  const handlePress = () => {
+    router.push('/societyPage');
+  };
 
   return (
-    <View style={styles.card}>
-      <View style={[styles.logoContainer, { borderColor: theme.colors.primary}]}>
+    <Pressable 
+      onPress={handlePress}
+      style={({ pressed }) => [
+        {
+          backgroundColor: pressed ? theme.colors.surfaceVariant : theme.colors.surface,
+          transform: pressed ? [{ scale: 0.95 }] : [{ scale: 1 }],
+        },
+        styles.card
+      ]}
+    >
+      <View style={[styles.logoContainer, { borderColor: theme.colors.primary }]}>
         <Image source={logo} style={styles.logo} resizeMode="contain" />
       </View>
       <Text style={[styles.name, { color: theme.colors.onSurface }]}>{name}</Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -23,6 +38,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
+    transition: 'transform 0.1s',
   },
   logoContainer: {
     width: 80,
