@@ -24,8 +24,8 @@ export default function SocietyCard(props) {
       <View style={styles.textContainer}>
         <Text style={[styles.name, { color: theme.colors.onSurface }]}>{props.name}</Text>
         <Text style={[styles.members, { color: theme.colors.onSurfaceVariant }]}>{props.members} members</Text>
-        <View style={[styles.categoryLabel, { backgroundColor: 'darkmagenta' }]}>
-          <Text style={styles.category}>{props.category}</Text>
+        <View style={[styles.categoryLabel, { backgroundColor: props.categoryColor }]}>
+          <Text style={[styles.category, { color: props.categoryTextColor }]}>{props.category}</Text>
         </View>
       </View>
       <View style={styles.logoContainer}>
@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   category: {
-    color: 'white',
     fontSize: 10,
     fontWeight: "bold",
   },

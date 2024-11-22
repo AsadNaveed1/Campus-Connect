@@ -1,40 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, Text, IconButton, Chip } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { firebaseDB } from '../../firebaseConfig';
 import SocietyCard from "../../components/SocietyCard";
 import MySocietyCard from "../../components/MySocietyCard";
 
 export default function Societies() {
   const theme = useTheme();
-  const [selectedChips, setSelectedChips] = useState([]);
+  const [chips, setChips] = useState([]);
+  const [selectedChip, setSelectedChip] = useState(null);
+  const [societies, setSocieties] = useState([]);
+  const [categories, setCategories] = useState({});
+  const scrollViewRef = useRef(null);
 
-  const chips = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"];
-
-  const handleChipPress = (chip) => {
-    setSelectedChips((prevSelectedChips) => {
-      if (prevSelectedChips.includes(chip)) {
-        return prevSelectedChips.filter((item) => item !== chip);
-      } else {
-        return [chip, ...prevSelectedChips];
-      }
+  useEffect(() => {
+    const unsubscribeCategories = onSnapshot(collection(firebaseDB, "categories"), (querySnapshot) => {
+      const categoriesData = {};
+      querySnapshot.docs.forEach(doc => {
+        categoriesData[doc.id] = doc.data();
+      });
+      setCategories(categoriesData);
+      setChips(Object.values(categoriesData));
     });
-  };
 
-  const renderChip = (chip) => {
-    const isSelected = selectedChips.includes(chip);
-    return (
-      <Chip
-        key={chip}
-        style={[styles.chip, isSelected && styles.selectedChip]}
-        textStyle={styles.chipText}
-        onPress={() => handleChipPress(chip)}
-        icon={isSelected ? () => <Ionicons name="checkmark" size={16} color="white" /> : null}
-      >
-        {chip}
-      </Chip>
-    );
+    const unsubscribeSocieties = onSnapshot(collection(firebaseDB, "societies"), (querySnapshot) => {
+      const societiesData = querySnapshot.docs.map(doc => doc.data());
+      setSocieties(societiesData);
+    });
+
+    return () => {
+      unsubscribeCategories();
+      unsubscribeSocieties();
+    };
+  }, []);
+
+  const handleChipPress = (chipName) => {
+    if (chipName === selectedChip) {
+      setSelectedChip(null);
+      setChips(Object.values(categories)); // Reset chips to original order
+    } else {
+      setSelectedChip(chipName);
+      setChips(prevChips => [
+        ...prevChips.filter(chip => chip.name === chipName),
+        ...prevChips.filter(chip => chip.name !== chipName)
+      ]);
+    }
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ x: 0, animated: true });
+    }
   };
 
   return (
@@ -56,14 +72,47 @@ export default function Societies() {
           <MySocietyCard style={styles.card} logo={require('../../assets/images/hku.png')} name="Society 5" />
         </ScrollView>
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>All Societies</Text>
-        <ScrollView horizontal contentContainerStyle={styles.chipContainer} showsHorizontalScrollIndicator={false}>
-          {selectedChips.concat(chips.filter(chip => !selectedChips.includes(chip))).map(renderChip)}
+        <ScrollView
+          horizontal
+          contentContainerStyle={styles.chipContainer}
+          showsHorizontalScrollIndicator={false}
+          ref={scrollViewRef}
+        >
+          {chips
+            .sort((a, b) => (a.name === selectedChip ? -1 : b.name === selectedChip ? 1 : 0))
+            .map(chip => {
+              const isSelected = selectedChip === chip.name;
+              const backgroundColor = `#${chip.backgroundColor}`;
+              const textColor = `#${chip.textColor}`;
+              return (
+                <Chip
+                  key={chip.name}
+                  style={[styles.chip, { backgroundColor }]}
+                  textStyle={{ color: textColor }}
+                  mode="contained"
+                  onPress={() => handleChipPress(chip.name)}
+                  icon={isSelected ? () => <Ionicons name="checkmark" size={16} color={textColor} /> : null}
+                >
+                  {chip.name}
+                </Chip>
+              );
+            })}
         </ScrollView>
-        <SocietyCard style={styles.card} name="Society A" members="100" category="Category 1" logoUrl={require('../../assets/images/hku.png')} />
-        <SocietyCard style={styles.card} name="Society B" members="150" category="Category 2" logoUrl={require('../../assets/images/hku.png')} />
-        <SocietyCard style={styles.card} name="Society C" members="200" category="Category 3" logoUrl={require('../../assets/images/hku.png')} />
-        <SocietyCard style={styles.card} name="Society D" members="200" category="Category 4" logoUrl={require('../../assets/images/hku.png')} />
-        <SocietyCard style={styles.card} name="Society E" members="200" category="Category 5" logoUrl={require('../../assets/images/hku.png')} />
+        {societies.map(society => {
+          const category = categories[society.category];
+          return (
+            <SocietyCard
+              key={society.name}
+              style={styles.card}
+              name={society.name}
+              members={`${society.members}`}
+              category={category ? category.name : ''}
+              categoryColor={category ? `#${category.backgroundColor}` : 'lightcoral'}
+              categoryTextColor={category ? `#${category.textColor}` : 'white'}
+              logoUrl={{ uri: society.logo }}
+            />
+          );
+        })}
       </ScrollView>
     </SafeAreaView>
   );
@@ -102,12 +151,5 @@ const styles = StyleSheet.create({
   chip: {
     borderRadius: 25,
     marginRight: 8,
-    backgroundColor: 'darkmagenta',
-  },
-  selectedChip: {
-    backgroundColor: 'darkmagenta',
-  },
-  chipText: {
-    color: 'white',
   },
 });
