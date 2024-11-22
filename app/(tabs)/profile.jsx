@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ToastAndroid, ScrollView, KeyboardAvoidingView, Image } from "react-native";
+import { View, StyleSheet, ToastAndroid, ScrollView, Image } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Text, TextInput, useTheme, IconButton } from "react-native-paper";
 import { getAuth, signOut } from 'firebase/auth';
@@ -77,122 +77,120 @@ export default function Profile() {
           onPress={handleEditModeChange}
         />
       </View>
-      <KeyboardAvoidingView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-          <View style={styles.container}>
-            <View style={styles.content}>
-              <Image source={require('../../assets/images/hku.png')} style={styles.logo} />
-              <Text variant="titleMedium" style={[styles.universityName, { color: theme.colors.onBackground }]}>
-                The University of Hong Kong
-              </Text>
-              <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
-                {user ? (
-                  <>
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
+          <View style={styles.content}>
+            <Image source={require('../../assets/images/hku.png')} style={styles.logo} />
+            <Text variant="titleMedium" style={[styles.universityName, { color: theme.colors.onBackground }]}>
+              The University of Hong Kong
+            </Text>
+            <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
+              {user ? (
+                <>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                    mode="outlined"
+                    label="Name"
+                    value={name}
+                    onChangeText={setName}
+                    placeholderTextColor={theme.colors.placeholder}
+                    outlineColor={isEditable ? theme.colors.outline : 'transparent'}
+                    theme={{ roundness: 15, colors: { background: 'transparent' } }}
+                    editable={isEditable}
+                    pointerEvents={isEditable ? 'auto' : 'none'}
+                  />
+                  <View style={styles.row}>
                     <TextInput
-                      style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                      style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
                       mode="outlined"
-                      label="Name"
-                      value={name}
-                      onChangeText={setName}
+                      label="Degree"
+                      value={degree}
+                      onChangeText={setDegree}
                       placeholderTextColor={theme.colors.placeholder}
                       outlineColor={isEditable ? theme.colors.outline : 'transparent'}
                       theme={{ roundness: 15, colors: { background: 'transparent' } }}
                       editable={isEditable}
                       pointerEvents={isEditable ? 'auto' : 'none'}
                     />
-                    <View style={styles.row}>
-                      <TextInput
-                        style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
-                        mode="outlined"
-                        label="Degree"
-                        value={degree}
-                        onChangeText={setDegree}
-                        placeholderTextColor={theme.colors.placeholder}
-                        outlineColor={isEditable ? theme.colors.outline : 'transparent'}
-                        theme={{ roundness: 15, colors: { background: 'transparent' } }}
-                        editable={isEditable}
-                        pointerEvents={isEditable ? 'auto' : 'none'}
-                      />
-                      <TextInput
-                        style={[styles.input, styles.largeInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
-                        mode="outlined"
-                        label="Major"
-                        value={major}
-                        onChangeText={setMajor}
-                        placeholderTextColor={theme.colors.placeholder}
-                        outlineColor={isEditable ? theme.colors.outline : 'transparent'}
-                        theme={{ roundness: 15, colors: { background: 'transparent' } }}
-                        editable={isEditable}
-                        pointerEvents={isEditable ? 'auto' : 'none'}
-                      />
-                    </View>
-                    <View style={styles.row}>
-                      <TextInput
-                        style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
-                        mode="outlined"
-                        label="Year"
-                        value={year}
-                        onChangeText={setYear}
-                        placeholderTextColor={theme.colors.placeholder}
-                        outlineColor={isEditable ? theme.colors.outline : 'transparent'}
-                        theme={{ roundness: 15, colors: { background: 'transparent' } }}
-                        editable={isEditable}
-                        pointerEvents={isEditable ? 'auto' : 'none'}
-                      />
-                      <TextInput
-                        style={[styles.input, styles.largeInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
-                        mode="outlined"
-                        label="University ID"
-                        value={universityID}
-                        onChangeText={setUniversityID}
-                        placeholderTextColor={theme.colors.placeholder}
-                        outlineColor={isEditable ? theme.colors.outline : 'transparent'}
-                        theme={{ roundness: 15, colors: { background: 'transparent' } }}
-                        editable={isEditable}
-                      />
-                    </View>
                     <TextInput
-                      style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                      style={[styles.input, styles.largeInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
                       mode="outlined"
-                      label="Bio"
-                      value={bio}
-                      onChangeText={setBio}
-                      multiline={true}
-                      numberOfLines={3}
+                      label="Major"
+                      value={major}
+                      onChangeText={setMajor}
+                      placeholderTextColor={theme.colors.placeholder}
+                      outlineColor={isEditable ? theme.colors.outline : 'transparent'}
+                      theme={{ roundness: 15, colors: { background: 'transparent' } }}
+                      editable={isEditable}
+                      pointerEvents={isEditable ? 'auto' : 'none'}
+                    />
+                  </View>
+                  <View style={styles.row}>
+                    <TextInput
+                      style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                      mode="outlined"
+                      label="Year"
+                      value={year}
+                      onChangeText={setYear}
+                      placeholderTextColor={theme.colors.placeholder}
+                      outlineColor={isEditable ? theme.colors.outline : 'transparent'}
+                      theme={{ roundness: 15, colors: { background: 'transparent' } }}
+                      editable={isEditable}
+                      pointerEvents={isEditable ? 'auto' : 'none'}
+                    />
+                    <TextInput
+                      style={[styles.input, styles.largeInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                      mode="outlined"
+                      label="University ID"
+                      value={universityID}
+                      onChangeText={setUniversityID}
                       placeholderTextColor={theme.colors.placeholder}
                       outlineColor={isEditable ? theme.colors.outline : 'transparent'}
                       theme={{ roundness: 15, colors: { background: 'transparent' } }}
                       editable={isEditable}
                     />
-                    <Button
-                      mode="contained"
-                      onPress={handleLogout}
-                      style={{ backgroundColor: theme.colors.error, marginTop: 16 }}
-                      labelStyle={{ color: theme.colors.onError }}
-                      icon={() => <Ionicons name="exit-outline" size={24} color={theme.colors.onError} />}
-                    >
-                      Logout
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Text variant="bodyMedium" style={[styles.signInPrompt, { color: theme.colors.onBackground }]}>
-                      Sign-in to see your profile.
-                    </Text>
-                    <Button
-                      mode="contained"
-                      onPress={handleSignIn}
-                      icon={() => <Ionicons name="person-circle-outline" size={24} color={theme.colors.onPrimary} />}
-                    >
-                      Sign-in
-                    </Button>
-                  </>
-                )}
-              </View>
+                  </View>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                    mode="outlined"
+                    label="Bio"
+                    value={bio}
+                    onChangeText={setBio}
+                    multiline={true}
+                    numberOfLines={3}
+                    placeholderTextColor={theme.colors.placeholder}
+                    outlineColor={isEditable ? theme.colors.outline : 'transparent'}
+                    theme={{ roundness: 15, colors: { background: 'transparent' } }}
+                    editable={isEditable}
+                  />
+                  <Button
+                    mode="contained"
+                    onPress={handleLogout}
+                    style={{ backgroundColor: theme.colors.error, marginTop: 16 }}
+                    labelStyle={{ color: theme.colors.onError }}
+                    icon={() => <Ionicons name="exit-outline" size={24} color={theme.colors.onError} />}
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Text variant="bodyMedium" style={[styles.signInPrompt, { color: theme.colors.onBackground }]}>
+                    Sign-in to see your profile.
+                  </Text>
+                  <Button
+                    mode="contained"
+                    onPress={handleSignIn}
+                    icon={() => <Ionicons name="person-circle-outline" size={24} color={theme.colors.onPrimary} />}
+                  >
+                    Sign-in
+                  </Button>
+                </>
+              )}
             </View>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

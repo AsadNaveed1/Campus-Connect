@@ -23,9 +23,8 @@ export default function TabLayout() {
         tabBarPosition: 'bottom',
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.onSurface,
-        tabBarShowLabel: false,
-        tabBarIconStyle: styles.tabBarIcon,
-        tabBarHideOnKeyboard: false,
+        tabBarShowLabel: true,
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tabs.Screen
@@ -75,11 +74,9 @@ const styles = StyleSheet.create({
     bottom: 24,
     width: '90%',
     marginHorizontal: '5%',
-    borderRadius: 15,
+    borderRadius: 30,
     elevation: 10,
     borderTopWidth: 0,
-  },
-  tabBarIcon: {
-    marginTop: 10,
+    paddingTop: 2,
   },
 });
