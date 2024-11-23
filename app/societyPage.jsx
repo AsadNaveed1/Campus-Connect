@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   caption: {
-    fontSize: 12,
+    fontSize: 16,
     padding: 8,
     textAlign: 'left',
     fontWeight: 'bold',
