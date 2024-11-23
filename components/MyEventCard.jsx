@@ -11,7 +11,9 @@ const MyEventCard = ({ circleImageUrl, eventName, societyName, eventDate }) => {
         <Image source={circleImageUrl} style={styles.circleImage} />
       </View>
       <View style={styles.contentContainer}>
-        <Text style={styles.eventName}>{eventName}</Text>
+        <Text style={styles.eventName} numberOfLines={1} ellipsizeMode="tail">
+          {eventName}
+        </Text>
         <Text style={styles.societyName}>{societyName}</Text>
         <Text style={styles.eventDate}>{eventDate}</Text>
       </View>
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 5,
     height: 80,
-    width: 230,
+    width: 210,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,

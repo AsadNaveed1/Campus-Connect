@@ -1,37 +1,64 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable, Animated } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const EventCard = ({ date, title, subtitle, location, imageUrl, circleImageUrl, minimal }) => {
   const theme = useTheme();
+  const router = useRouter();
+  const scale = new Animated.Value(1);
+
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePress = () => {
+    router.push('/eventPage');
+  };
 
   return (
-    <View style={[styles.cardContainer, { backgroundColor: theme.colors.surface }]}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: imageUrl }} style={styles.image} />
-        <View style={[styles.dateBadge, { backgroundColor: `${theme.colors.surface}` }]}>
-          <Text style={[styles.dateText, { color: theme.colors.onSurface }]}>{date}</Text>
-        </View>
-      </View>
-      {!minimal && (
-        <View style={styles.circleImageContainer}>
-          <Image source={circleImageUrl} style={styles.circleImage} />
-        </View>
-      )}
-      <View style={[styles.detailsContainer, minimal && styles.minimalDetailsContainer]}>
-        <Text style={[styles.title, { color: theme.colors.onSurface }, minimal && styles.minimalTitle]}>{title}</Text>
-        {!minimal && (
-          <Text style={[styles.subtitle, { color: theme.colors.onSurface }]}>{subtitle}</Text>
-        )}
-        <View style={styles.bottomRow}>
-          <View style={styles.locationContainer}>
-            <Ionicons name="location-sharp" size={16} color={theme.colors.onSurface} />
-            <Text style={[styles.location, { color: theme.colors.onSurface }]}>{location}</Text>
+    <Pressable
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      onPress={handlePress}
+    >
+      <Animated.View style={[styles.cardContainer, { backgroundColor: theme.colors.surface, transform: [{ scale }] }]}>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: imageUrl }} style={styles.image} />
+          <View style={[styles.dateBadge, { backgroundColor: `${theme.colors.surface}` }]}>
+            <Text style={[styles.dateText, { color: theme.colors.onSurface }]}>{date}</Text>
           </View>
         </View>
-      </View>
-    </View>
+        {!minimal && (
+          <View style={styles.circleImageContainer}>
+            <Image source={circleImageUrl} style={styles.circleImage} />
+          </View>
+        )}
+        <View style={[styles.detailsContainer, minimal && styles.minimalDetailsContainer]}>
+          <Text style={[styles.title, { color: theme.colors.onSurface }, minimal && styles.minimalTitle]}>{title}</Text>
+          {!minimal && (
+            <Text style={[styles.subtitle, { color: theme.colors.onSurface }]}>{subtitle}</Text>
+          )}
+          <View style={styles.bottomRow}>
+            <View style={styles.locationContainer}>
+              <Ionicons name="location-sharp" size={16} color={theme.colors.onSurface} />
+              <Text style={[styles.location, { color: theme.colors.onSurface }]}>{location}</Text>
+            </View>
+          </View>
+        </View>
+      </Animated.View>
+    </Pressable>
   );
 };
 

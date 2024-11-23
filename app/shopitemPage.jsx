@@ -11,12 +11,11 @@ import {
   Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ShopCard from "../components/ShopCard"; // Import ShopCard component
+import ShopCard from "../components/ShopCard";
 import { useRouter } from "expo-router";
 const { width: screenWidth } = Dimensions.get("window");
 
 export default function ShopItemPage() {
-  // Sample data for items sold by the same society
   const router = useRouter();
   const otherItems = [
     {

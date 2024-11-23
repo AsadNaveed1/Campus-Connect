@@ -3,8 +3,7 @@ import { View, StyleSheet, Image, ImageBackground, Text, ScrollView } from 'reac
 import { useTheme } from 'react-native-paper';
 import { TabsProvider, Tabs, TabScreen } from 'react-native-paper-tabs';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ShopCard from '../components/ShopCard';
-import SocietyEventsCard from '../components/SocietyEventsCard'; // Import the SocietyEventsCard component
+import ShopCard from '../components/ShopCard'; // Import the SocietyEventsCard component
 import { FlatList, TouchableOpacity } from 'react-native';
 
 
@@ -56,8 +55,6 @@ export default function SocietyPage() {
               <PostsTabContent label="Posts" />
             </TabScreen>
             <TabScreen label="Events">
-              {/* <TabContent label="Events" />   */}
-              <SocietyEventsCard/>
             </TabScreen>
             <TabScreen label="Shop">
               <ShopTabContent label="Shop" />
