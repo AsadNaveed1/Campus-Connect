@@ -203,6 +203,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'transparent',
   },
+  shopContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
   tabs: {
     justifyContent: 'center',
     alignItems: 'center',
