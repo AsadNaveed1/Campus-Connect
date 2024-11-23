@@ -22,7 +22,7 @@ export default function MySocietyCard(props) {
         styles.card
       ]}
     >
-      <View style={styles.logoContainer}>
+      <View style={[styles.logoContainer, { borderColor: theme.colors.surface }]}>
         <Image source={props.logo} style={styles.logo} resizeMode="contain" />
       </View>
       <Text style={[styles.name, { color: theme.colors.onSurface }]}>{props.name}</Text>
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     overflow: "hidden",
     backgroundColor: 'white',
-    borderWidth: 0,
+    borderWidth: 3,
     elevation: 5,
   },
   logo: {
