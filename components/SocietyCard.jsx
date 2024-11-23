@@ -4,11 +4,12 @@ import { Text, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
 export default function SocietyCard(props) {
+  const { societyId, name, members, category, categoryColor, categoryTextColor, logoUrl } = props;
   const theme = useTheme();
   const router = useRouter();
 
   const handlePress = () => {
-    router.push('/societyPage');
+    router.push({ pathname: "/societyPage", params: { societyId } });
   };
 
   return (
@@ -22,14 +23,14 @@ export default function SocietyCard(props) {
       ]}
     >
       <View style={styles.textContainer}>
-        <Text style={[styles.name, { color: theme.colors.onSurface }]}>{props.name}</Text>
-        <Text style={[styles.members, { color: theme.colors.onSurfaceVariant }]}>{props.members} members</Text>
-        <View style={[styles.categoryLabel, { backgroundColor: props.categoryColor }]}>
-          <Text style={[styles.category, { color: props.categoryTextColor }]}>{props.category}</Text>
+        <Text style={[styles.name, { color: theme.colors.onSurface }]}>{name}</Text>
+        <Text style={[styles.members, { color: theme.colors.onSurfaceVariant }]}>{members} members</Text>
+        <View style={[styles.categoryLabel, { backgroundColor: categoryColor }]}>
+          <Text style={[styles.category, { color: categoryTextColor }]}>{category}</Text>
         </View>
       </View>
       <View style={styles.logoContainer}>
-        <Image source={props.logoUrl} style={styles.logo} resizeMode="contain" />
+        <Image source={{ uri: logoUrl }} style={styles.logo} resizeMode="contain" />
       </View>
     </Pressable>
   );

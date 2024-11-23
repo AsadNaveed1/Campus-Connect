@@ -29,7 +29,7 @@ export default function Societies() {
 
     const societiesQuery = query(collection(firebaseDB, "societies"), orderBy("name", "asc"));
     const unsubscribeSocieties = onSnapshot(societiesQuery, (querySnapshot) => {
-      const societiesData = querySnapshot.docs.map(doc => doc.data());
+      const societiesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setSocieties(societiesData);
     });
 
@@ -106,14 +106,15 @@ export default function Societies() {
             const category = categories[society.category];
             return (
               <SocietyCard
-                key={society.name}
+                key={society.id}
+                societyId={society.id}
                 style={styles.card}
                 name={society.name}
                 members={`${society.members}`}
                 category={category ? category.name : ''}
                 categoryColor={category ? `#${category.backgroundColor}` : 'lightcoral'}
                 categoryTextColor={category ? `#${category.textColor}` : 'white'}
-                logoUrl={{ uri: society.logo }}
+                logoUrl={society.logo}
               />
             );
           })}

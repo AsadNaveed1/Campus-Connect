@@ -3,13 +3,41 @@ import { SafeAreaView, ScrollView, View, Image, StyleSheet } from 'react-native'
 import { Text, Button, IconButton } from 'react-native-paper';
 import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import { doc, getDoc } from 'firebase/firestore';
+import { firebaseDB } from '../firebaseConfig';
 
 const EventPage = () => {
+  const { eventId } = useLocalSearchParams();
   const theme = useTheme();
   const router = useRouter();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [eventData, setEventData] = useState(null);
+  const [societyData, setSocietyData] = useState(null);
+
+  useEffect(() => {
+    const fetchEventData = async () => {
+      try {
+        const eventDoc = await getDoc(doc(firebaseDB, 'events', eventId));
+        if (eventDoc.exists()) {
+          const eventData = eventDoc.data();
+          setEventData(eventData);
+
+          const societyDoc = await getDoc(doc(firebaseDB, 'societies', eventData.society));
+          if (societyDoc.exists()) {
+            setSocietyData(societyDoc.data());
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching event data:', error);
+      }
+    };
+
+    if (eventId) {
+      fetchEventData();
+    }
+  }, [eventId]);
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -45,12 +73,20 @@ const EventPage = () => {
     router.back();
   };
 
+  if (!eventData || !societyData) {
+    return (
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={[styles.imageContainer, { backgroundColor: theme.colors.surface }]}>
           <Image
-            source={{ uri: 'https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg' }}
+            source={{ uri: eventData.backgroundImage }}
             style={styles.image}
           />
           <IconButton
@@ -61,36 +97,33 @@ const EventPage = () => {
           />
         </View>
         <View style={styles.circleImageContainer}>
-          <Image source={require('../assets/images/hku.png')} style={styles.circleImage} />
+          <Image source={{ uri: societyData.logo }} style={styles.circleImage} />
         </View>
         <View style={styles.detailsContainer}>
           <View style={styles.detailsHeader}>
-            <Text variant="titleLarge" style={[styles.title, { color: theme.colors.onSurface }]}>Dummy Event Title</Text>
+            <Text variant="titleLarge" style={[styles.title, { color: theme.colors.onSurface }]}>{eventData.name}</Text>
             <View style={[styles.feeBadge, { backgroundColor: theme.colors.surface }]}>
-              <Text variant="bodyMedium" style={[styles.feeText, { color: theme.colors.onSurface, fontWeight: 'bold' }]}>$0</Text>
+              <Text variant="bodyMedium" style={[styles.feeText, { color: theme.colors.onSurface, fontWeight: 'bold' }]}>${eventData.fee}</Text>
             </View>
           </View>
-          <Text variant="bodyMedium" style={[styles.societyName, { color: 'grey' }]}>Dummy Society</Text>
+          <Text variant="bodyMedium" style={[styles.societyName, { color: 'grey' }]}>{societyData.name}</Text>
           <View style={styles.eventDetails}>
             <View style={styles.detailRow}>
               <Ionicons name="calendar" size={16} color="grey" />
-              <Text variant="bodyMedium" style={[styles.detailText, { color: 'grey' }]}>January 1, 2025</Text>
+              <Text variant="bodyMedium" style={[styles.detailText, { color: 'grey' }]}>{new Date(eventData.time.seconds * 1000).toLocaleDateString()}</Text>
             </View>
             <View style={styles.detailRow}>
               <Ionicons name="time" size={16} color="grey" />
-              <Text variant="bodyMedium" style={[styles.detailText, { color: 'grey' }]}>12:00 PM - 3:00 PM</Text>
+              <Text variant="bodyMedium" style={[styles.detailText, { color: 'grey' }]}>{new Date(eventData.time.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
             </View>
             <View style={styles.detailRow}>
               <Ionicons name="location-sharp" size={16} color="grey" />
-              <Text variant="bodyMedium" style={[styles.detailText, { color: 'grey' }]}>Dummy Location</Text>
+              <Text variant="bodyMedium" style={[styles.detailText, { color: 'grey' }]}>{eventData.location}</Text>
             </View>
           </View>
           <ScrollView style={styles.descriptionContainer} showsVerticalScrollIndicator={false}>
             <Text variant="bodyMedium" style={[styles.descriptionText, { color: theme.colors.onSurface }]}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor 
-              in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
+              {eventData.description}
             </Text>
           </ScrollView>
         </View>

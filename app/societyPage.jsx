@@ -1,18 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import { useTheme, Text, IconButton, Button } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { doc, getDoc } from 'firebase/firestore';
+import { firebaseDB } from '../firebaseConfig';
 import EventCard from '../components/EventCard';
 import ShopCard from '../components/ShopCard';
 
 const SocietyPage = () => {
   const theme = useTheme();
+  const router = useRouter();
+  const { societyId } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState('Posts');
+  const [societyData, setSocietyData] = useState(null);
+  const [categoryName, setCategoryName] = useState('');
+
+  useEffect(() => {
+    const fetchSocietyData = async () => {
+      try {
+        const societyDoc = await getDoc(doc(firebaseDB, 'societies', societyId));
+        if (societyDoc.exists()) {
+          const data = societyDoc.data();
+          setSocietyData(data);
+
+          const categoryDoc = await getDoc(doc(firebaseDB, 'categories', data.category));
+          if (categoryDoc.exists()) {
+            setCategoryName(categoryDoc.data().name);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching society data:', error);
+      }
+    };
+
+    if (societyId) {
+      fetchSocietyData();
+    }
+  }, [societyId]);
 
   const handleBackButton = () => {
     router.back();
   };
+
+  if (!societyData) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   const posts = [
     { id: '1', image: require('../assets/images/hoodie.jpg'), caption: 'Enjoying the society vibes!' },
@@ -63,13 +100,13 @@ const SocietyPage = () => {
       />
 
       <ImageBackground
-        source={require('../assets/images/banner.jpg')}
+        source={{ uri: societyData.backgroundImage }}
         style={styles.societyInfo}
         resizeMode="cover"
       >
         <View style={styles.logoContainer}>
           <Image
-            source={require('../assets/images/hku.png')}
+            source={{ uri: societyData.logo }}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -79,7 +116,7 @@ const SocietyPage = () => {
       <View style={styles.detailsContainer}>
         <View style={styles.nameContainer}>
           <Text style={[styles.name, { color: theme.colors.onBackground }]}>
-            Data Science Society
+            {societyData.name}
           </Text>
           <IconButton
             icon={() => <Ionicons name="qr-code" size={16} color="grey" />}
@@ -89,11 +126,11 @@ const SocietyPage = () => {
         </View>
         <Button mode="text" style={styles.joinButton}>Join Us</Button>
         <View style={styles.tagsContainer}>
-          <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>150 Members</Text>
-          <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>LGBTQIA+</Text>
+          <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>{societyData.members} Members</Text>
+          <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>{categoryName}</Text>
         </View>
         <Text style={[styles.details, { color: theme.colors.onBackground }]}>
-          A vibrant community for members to connect and grow.
+          {societyData.description}
         </Text>
       </View>
     </>
@@ -218,6 +255,7 @@ const styles = StyleSheet.create({
     bottom: -20,
     backgroundColor: 'rgba(255, 255, 255, 1)',
     zIndex: 1,
+    overflow: 'hidden',
   },
   logo: {
     width: '100%',

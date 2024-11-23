@@ -4,7 +4,8 @@ import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-const EventCard = ({ date, title, subtitle, location, imageUrl, circleImageUrl, minimal }) => {
+const EventCard = (props) => {
+  const { eventId, date, title, subtitle, location, imageUrl, circleImageUrl, minimal } = props;
   const theme = useTheme();
   const router = useRouter();
   const scale = new Animated.Value(1);
@@ -24,7 +25,7 @@ const EventCard = ({ date, title, subtitle, location, imageUrl, circleImageUrl, 
   };
 
   const handlePress = () => {
-    router.push('/eventPage');
+    router.push({ pathname: "/eventPage", params: { eventId } });
   };
 
   return (
@@ -36,8 +37,8 @@ const EventCard = ({ date, title, subtitle, location, imageUrl, circleImageUrl, 
       <Animated.View style={[styles.cardContainer, { backgroundColor: theme.colors.surface, transform: [{ scale }] }]}>
         <View style={styles.imageContainer}>
           <Image source={{ uri: imageUrl }} style={styles.image} />
-          <View style={[styles.dateBadge, { backgroundColor: `${theme.colors.surface}` }]}>
-            <Text style={[styles.dateText, { color: theme.colors.onSurface }]}>{date}</Text>
+          <View style={[styles.dateBadge, { backgroundColor: `${theme.colors.background}` }]}>
+            <Text style={[styles.dateText, { color: theme.colors.onBackground }]}>{date}</Text>
           </View>
         </View>
         {!minimal && (
@@ -82,6 +83,7 @@ const styles = StyleSheet.create({
     right: 15,
     borderRadius: 15,
     padding: 5,
+    elevation: 5,
   },
   dateText: {
     fontSize: 10,

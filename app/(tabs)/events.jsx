@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthContext } from "../../contexts/AuthContext";
@@ -6,10 +6,34 @@ import { useTheme, Text, IconButton } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
 import EventCard from "../../components/EventCard";
 import MyEventCard from "../../components/MyEventCard";
+import { collection, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { firebaseDB } from '../../firebaseConfig';
 
 export default function Events() {
   const user = useAuthContext();
   const theme = useTheme();
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(firebaseDB, 'events'), async (snapshot) => {
+      const eventsData = await Promise.all(snapshot.docs.map(async (eventDoc) => {
+        const eventData = eventDoc.data();
+        const societyDoc = await getDoc(doc(firebaseDB, 'societies', eventData.society));
+        const societyData = societyDoc.exists() ? societyDoc.data() : {};
+        return {
+          ...eventData,
+          id: eventDoc.id,
+          societyName: societyData.name,
+          societyLogo: societyData.logo,
+        };
+      }));
+      setEvents(eventsData);
+    }, (error) => {
+      console.error("Error fetching events:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -53,24 +77,18 @@ export default function Events() {
           All Events
         </Text>
         <View>
-          <EventCard
-            date="25/09/2024"
-            title="Event Name"
-            subtitle="Society Name"
-            location="Location"
-            onJoinPress={() => {}}
-            imageUrl="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
-            circleImageUrl={require('../../assets/images/hku.png')}
-          />
-          <EventCard
-            date="30/09/2024"
-            title="Another Event"
-            subtitle="Another Society"
-            location="Another Location"
-            onJoinPress={() => {}}
-            imageUrl="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
-            circleImageUrl={require('../../assets/images/hku.png')}
-          />
+          {events.map((event) => (
+            <EventCard
+              key={event.id}
+              eventId={event.id}
+              date={new Date(event.time.seconds * 1000).toLocaleDateString()}
+              title={event.name}
+              subtitle={event.societyName}
+              location={event.location}
+              imageUrl={event.backgroundImage}
+              circleImageUrl={{ uri: event.societyLogo }}
+            />
+          ))}
         </View>
       </ScrollView>
     </SafeAreaView>
