@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
-import { useTheme, Text, IconButton } from 'react-native-paper';
+import { useTheme, Text, IconButton, Button } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import EventCard from '../components/EventCard';
@@ -77,9 +77,17 @@ const SocietyPage = () => {
       </ImageBackground>
 
       <View style={styles.detailsContainer}>
-        <Text style={[styles.name, { color: theme.colors.onBackground }]}>
-          Data Science Society
-        </Text>
+        <View style={styles.nameContainer}>
+          <Text style={[styles.name, { color: theme.colors.onBackground }]}>
+            Data Science Society
+          </Text>
+          <IconButton
+            icon={() => <Ionicons name="qr-code" size={16} color="grey" />}
+            size={18}
+            style={[styles.qrButton, { backgroundColor: 'rgba(128, 128, 128, 0.1)' }]}
+          />
+        </View>
+        <Button mode="text" style={styles.joinButton}>Join Us</Button>
         <View style={styles.tagsContainer}>
           <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>150 Members</Text>
           <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>LGBTQIA+</Text>
@@ -217,16 +225,17 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   detailsContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-    padding: 16,
-    borderRadius: 12,
+    marginVertical: 20,
     marginHorizontal: 16,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'baseline',
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 8,
   },
   details: {
     fontSize: 12,
@@ -239,7 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    marginTop: 0,
+    marginTop: 8,
   },
   tag: {
     borderRadius: 7,
@@ -257,7 +266,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -332,6 +340,14 @@ const styles = StyleSheet.create({
   },
   eventsContainer: {
     padding: 10,
+  },
+  joinButton: {
+    marginBottom: 8,
+    paddingHorizontal: 20,
+  },
+  qrButton: {
+    borderRadius: 20,
+    padding: 5,
   },
 });
 
