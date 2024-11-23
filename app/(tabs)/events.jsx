@@ -14,7 +14,7 @@ export default function Events() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.header}>
-        <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.onBackground }]}>
+        <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
           Events
         </Text>
         <IconButton

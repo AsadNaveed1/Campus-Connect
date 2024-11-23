@@ -132,8 +132,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 40,
-    left: 15,
+    top: 20,
+    left: 16,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 20,
   },
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   circleImageContainer: {
     position: 'absolute',
     top: '33%',
-    left: '5%',
+    left: 20,
     zIndex: 1,
     width: 80,
     height: 80,
