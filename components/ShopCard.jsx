@@ -1,12 +1,18 @@
 import React from 'react';
 import { View, Text, ImageBackground, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import { useRouter } from "expo-router";
 
 const ShopCard = ({ image, title, price, onPress }) => {
   const theme = useTheme();
+  const router = useRouter();
 
+  const handlePress = () => {
+    router.push("/shopitemPage");
+  };
   return (
     <Pressable
+      onPress={handlePress}
       style={({ pressed }) => [
         styles.card,
         {
@@ -14,7 +20,6 @@ const ShopCard = ({ image, title, price, onPress }) => {
           transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }], // Slightly scales down the card when pressed
         },
       ]}
-      onPress={onPress}
     >
       {/* Full Image Background */}
       <ImageBackground source={image} style={styles.image}>
