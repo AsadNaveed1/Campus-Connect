@@ -19,7 +19,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarStyle: [styles.tabBar, { backgroundColor: colors.surface, borderTopColor: 'transparent' }],
+        tabBarStyle: [styles.tabBar, { backgroundColor: colors.background, borderTopColor: 'transparent' }],
         tabBarPosition: 'bottom',
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.onSurface,

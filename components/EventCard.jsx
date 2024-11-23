@@ -1,37 +1,34 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { Button, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 
-const EventCard = ({ date, title, subtitle, location, onJoinPress, imageUrl, circleImageUrl }) => {
+const EventCard = ({ date, title, subtitle, location, imageUrl, circleImageUrl, minimal }) => {
   const theme = useTheme();
 
   return (
     <View style={[styles.cardContainer, { backgroundColor: theme.colors.surface }]}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: imageUrl }} style={styles.image} />
-        <View style={[styles.dateBadge, { backgroundColor: `${theme.colors.secondaryContainer}` }]}>
-          <Text style={[styles.dateText, { color: theme.colors.onSecondaryContainer }]}>{date}</Text>
+        <View style={[styles.dateBadge, { backgroundColor: `${theme.colors.surface}` }]}>
+          <Text style={[styles.dateText, { color: theme.colors.onSurface }]}>{date}</Text>
         </View>
       </View>
-      <View style={styles.circleImageContainer}>
-        <Image source={circleImageUrl} style={styles.circleImage} />
-      </View>
-      <View style={styles.detailsContainer}>
-        <Text style={[styles.title, { color: theme.colors.onSurface }]}>{title}</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.onSurface }]}>{subtitle}</Text>
+      {!minimal && (
+        <View style={styles.circleImageContainer}>
+          <Image source={circleImageUrl} style={styles.circleImage} />
+        </View>
+      )}
+      <View style={[styles.detailsContainer, minimal && styles.minimalDetailsContainer]}>
+        <Text style={[styles.title, { color: theme.colors.onSurface }, minimal && styles.minimalTitle]}>{title}</Text>
+        {!minimal && (
+          <Text style={[styles.subtitle, { color: theme.colors.onSurface }]}>{subtitle}</Text>
+        )}
         <View style={styles.bottomRow}>
           <View style={styles.locationContainer}>
             <Ionicons name="location-sharp" size={16} color={theme.colors.onSurface} />
             <Text style={[styles.location, { color: theme.colors.onSurface }]}>{location}</Text>
           </View>
-          <Button
-            mode="contained" 
-            onPress={onJoinPress} 
-            labelStyle={styles.joinButtonText}
-          >
-            Join
-          </Button>
         </View>
       </View>
     </View>
@@ -43,13 +40,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     elevation: 5,
+    marginVertical: 10,
   },
   imageContainer: {
     position: 'relative',
   },
   image: {
     width: '100%',
-    height: 150,
+    height: 120,
   },
   dateBadge: {
     position: 'absolute',
@@ -85,10 +83,16 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingTop: 30,
   },
+  minimalDetailsContainer: {
+    paddingTop: 15,
+  },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 2,
+  },
+  minimalTitle: {
+    marginBottom: 0,
   },
   subtitle: {
     fontSize: 14,
@@ -106,10 +110,6 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 12,
     marginLeft: 5,
-  },
-  joinButtonText: {
-    fontSize: 12,
-    fontWeight: 'bold',
   },
 });
 

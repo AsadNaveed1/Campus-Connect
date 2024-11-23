@@ -14,28 +14,64 @@ export default function Events() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.header}>
-        <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>Events</Text>
+        <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.onBackground }]}>
+          Events
+        </Text>
         <IconButton
           icon={() => <Ionicons name="add" size={24} color={theme.colors.onBackground} />}
           onPress={() => {}}
         />
       </View>
-      <ScrollView contentContainerStyle={styles.container}>
-      <MyEventCard
-          circleImageUrl={require('../../assets/images/hku.png')}
-          eventName="Event Name"
-          societyName="Society Name"
-          eventDate="25/09/2024"
-        />
-        <EventCard
-          date="25/09/2024"
-          title="Event Name"
-          subtitle="Society Name"
-          location="Location"
-          onJoinPress={() => {}}
-          imageUrl="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
-          circleImageUrl={require('../../assets/images/hku.png')}
-        />
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}> 
+        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+          My Events
+        </Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          style={styles.myEventsScroll}>
+          <MyEventCard
+            circleImageUrl={require('../../assets/images/hku.png')}
+            eventName="Event Name"
+            societyName="Society Name"
+            eventDate="25/09/2024"
+          />
+          <MyEventCard
+            circleImageUrl={require('../../assets/images/hku.png')}
+            eventName="Another Event"
+            societyName="Another Society"
+            eventDate="30/09/2024"
+          />
+          <MyEventCard
+            circleImageUrl={require('../../assets/images/hku.png')}
+            eventName="Yet Another Event"
+            societyName="Cool Society"
+            eventDate="05/10/2024"
+          />
+        </ScrollView>
+        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+          All Events
+        </Text>
+        <View>
+          <EventCard
+            date="25/09/2024"
+            title="Event Name"
+            subtitle="Society Name"
+            location="Location"
+            onJoinPress={() => {}}
+            imageUrl="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
+            circleImageUrl={require('../../assets/images/hku.png')}
+          />
+          <EventCard
+            date="30/09/2024"
+            title="Another Event"
+            subtitle="Another Society"
+            location="Another Location"
+            onJoinPress={() => {}}
+            imageUrl="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
+            circleImageUrl={require('../../assets/images/hku.png')}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -55,5 +91,13 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 24,
+    paddingBottom: 100,
+  },
+  sectionTitle: {
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  myEventsScroll: {
+    marginBottom: 16,
   },
 });
