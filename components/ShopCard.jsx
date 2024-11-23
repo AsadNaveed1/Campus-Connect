@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 10,
   },
   title: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center', // Center-align the text
   },

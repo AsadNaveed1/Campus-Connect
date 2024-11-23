@@ -203,6 +203,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'transparent',
   },
+  shopContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
   tabs: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -239,7 +244,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   caption: {
-    fontSize: 12,
+    fontSize: 16,
     padding: 8,
     textAlign: 'left',
     fontWeight: 'bold',
