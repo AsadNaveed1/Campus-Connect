@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   horizontalScroll: {
     marginBottom: 28,

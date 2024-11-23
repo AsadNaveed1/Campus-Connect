@@ -21,11 +21,12 @@ const MyEventCard = ({ circleImageUrl, eventName, societyName, eventDate }) => {
 
 const styles = StyleSheet.create({
   cardContainer: {
-    borderRadius: 100,
+    borderRadius: 50,
     overflow: 'hidden',
     elevation: 5,
-    margin: 10,
-    height: '20%',
+    marginVertical: 10,
+    marginHorizontal: 5,
+    height: 80,
     width: 230,
     flexDirection: 'row',
     alignItems: 'center',
