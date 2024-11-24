@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
-import { useTheme, Text, IconButton, Button } from 'react-native-paper';
+import { View, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground, SafeAreaView } from 'react-native';
+import { useTheme, Text, IconButton, Button, ActivityIndicator } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
@@ -15,6 +15,7 @@ const SocietyPage = () => {
   const [activeTab, setActiveTab] = useState('Posts');
   const [societyData, setSocietyData] = useState(null);
   const [categoryName, setCategoryName] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSocietyData = async () => {
@@ -22,12 +23,14 @@ const SocietyPage = () => {
         const societyDoc = await getDoc(doc(firebaseDB, 'societies', societyId));
         if (societyDoc.exists()) {
           const data = societyDoc.data();
-          setSocietyData(data);
-
           const categoryDoc = await getDoc(doc(firebaseDB, 'categories', data.category));
           if (categoryDoc.exists()) {
             setCategoryName(categoryDoc.data().name);
           }
+          setTimeout(() => {
+            setSocietyData(data);
+            setLoading(false);
+          }, 200);
         }
       } catch (error) {
         console.error('Error fetching society data:', error);
@@ -43,10 +46,10 @@ const SocietyPage = () => {
     router.back();
   };
 
-  if (!societyData) {
+  if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Loading...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -184,41 +187,48 @@ const SocietyPage = () => {
   );
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={[styles.safeArea, { backgroundColor: theme.colors.background }]}>
-      {renderHeader()}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: theme.colors.background }}>
+        {renderHeader()}
 
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'Posts' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
-          onPress={() => setActiveTab('Posts')}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'Posts' ? theme.colors.primary : theme.colors.onSurface }]}>Posts</Text>
-        </TouchableOpacity>
-       
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'Events' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
-          onPress={() => setActiveTab('Events')}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'Events' ? theme.colors.primary : theme.colors.onSurface }]}>Events</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'Shop' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
-          onPress={() => setActiveTab('Shop')}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'Shop' ? theme.colors.primary : theme.colors.onSurface }]}>Shop</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tabButton, activeTab === 'Posts' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
+            onPress={() => setActiveTab('Posts')}
+          >
+            <Text style={[styles.tabText, { color: activeTab === 'Posts' ? theme.colors.primary : theme.colors.onSurface }]}>Posts</Text>
+          </TouchableOpacity>
+        
+          <TouchableOpacity
+            style={[styles.tabButton, activeTab === 'Events' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
+            onPress={() => setActiveTab('Events')}
+          >
+            <Text style={[styles.tabText, { color: activeTab === 'Events' ? theme.colors.primary : theme.colors.onSurface }]}>Events</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tabButton, activeTab === 'Shop' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
+            onPress={() => setActiveTab('Shop')}
+          >
+            <Text style={[styles.tabText, { color: activeTab === 'Shop' ? theme.colors.primary : theme.colors.onSurface }]}>Shop</Text>
+          </TouchableOpacity>
+        </View>
 
-      {activeTab === 'Posts' && renderPosts()}
-      {activeTab === 'Shop' && renderShop()}
-      {activeTab === 'Events' && renderEvents()}
-    </ScrollView>
+        {activeTab === 'Posts' && renderPosts()}
+        {activeTab === 'Shop' && renderShop()}
+        {activeTab === 'Events' && renderEvents()}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   societyInfo: {
     height: 160,

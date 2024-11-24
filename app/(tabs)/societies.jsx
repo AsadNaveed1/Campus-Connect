@@ -7,6 +7,7 @@ import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
 import SocietyCard from "../../components/SocietyCard";
 import MySocietyCard from "../../components/MySocietyCard";
+import SearchButton from '../../components/SearchButton';
 
 export default function Societies() {
   const theme = useTheme();
@@ -45,10 +46,7 @@ export default function Societies() {
       setChips(Object.values(categories));
     } else {
       setSelectedChip(chipName);
-      setChips(prevChips => [
-        ...prevChips.filter(chip => chip.name === chipName),
-        ...prevChips.filter(chip => chip.name !== chipName)
-      ]);
+      setChips(Object.values(categories));
     }
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({ x: 0, animated: true });
@@ -119,6 +117,7 @@ export default function Societies() {
             );
           })}
       </ScrollView>
+      <SearchButton />
     </SafeAreaView>
   );
 }

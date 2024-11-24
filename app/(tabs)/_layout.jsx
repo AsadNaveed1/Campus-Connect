@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     width: '90%',
     marginHorizontal: '5%',
     borderRadius: 30,
-    elevation: 20,
+    elevation: 30,
     borderTopWidth: 0,
     paddingTop: 2,
   },

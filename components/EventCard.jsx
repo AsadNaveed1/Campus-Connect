@@ -102,11 +102,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderColor: 'lightgrey',
     borderWidth: 1,
-    padding: 8,
   },
   circleImage: {
     width: '100%',
     height: '100%',
+    resizeMode: 'contain',
   },
   detailsContainer: {
     padding: 15,

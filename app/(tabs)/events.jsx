@@ -6,6 +6,7 @@ import { useTheme, Text, IconButton } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
 import EventCard from "../../components/EventCard";
 import MyEventCard from "../../components/MyEventCard";
+import SearchButton from "../../components/SearchButton";
 import { collection, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
 
@@ -27,6 +28,8 @@ export default function Events() {
           societyLogo: societyData.logo,
         };
       }));
+      // Sort events by timestamp
+      eventsData.sort((a, b) => a.time.seconds - b.time.seconds);
       setEvents(eventsData);
     }, (error) => {
       console.error("Error fetching events:", error);
@@ -91,6 +94,7 @@ export default function Events() {
           ))}
         </View>
       </ScrollView>
+      <SearchButton />
     </SafeAreaView>
   );
 }

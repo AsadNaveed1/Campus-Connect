@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, ScrollView, View, Image, StyleSheet } from 'react-native';
-import { Text, Button, IconButton } from 'react-native-paper';
+import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -15,6 +15,7 @@ const EventPage = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [eventData, setEventData] = useState(null);
   const [societyData, setSocietyData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -22,11 +23,13 @@ const EventPage = () => {
         const eventDoc = await getDoc(doc(firebaseDB, 'events', eventId));
         if (eventDoc.exists()) {
           const eventData = eventDoc.data();
-          setEventData(eventData);
-
           const societyDoc = await getDoc(doc(firebaseDB, 'societies', eventData.society));
           if (societyDoc.exists()) {
-            setSocietyData(societyDoc.data());
+            setTimeout(() => {
+              setEventData(eventData);
+              setSocietyData(societyDoc.data());
+              setLoading(false);
+            }, 200);
           }
         }
       } catch (error) {
@@ -73,10 +76,10 @@ const EventPage = () => {
     router.back();
   };
 
-  if (!eventData || !societyData) {
+  if(loading) {
     return (
-      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Loading...</Text>
+      <SafeAreaView style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </SafeAreaView>
     );
   }
@@ -150,6 +153,11 @@ const EventPage = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   scrollViewContent: {
     flexGrow: 1,
   },
@@ -173,6 +181,7 @@ const styles = StyleSheet.create({
   circleImage: {
     width: '100%',
     height: '100%',
+    resizeMode: 'contain',
   },
   circleImageContainer: {
     position: 'absolute',
@@ -187,7 +196,6 @@ const styles = StyleSheet.create({
     borderColor: 'lightgrey',
     backgroundColor: 'white',
     borderWidth: 1,
-    padding: 12,
   },
   detailsContainer: {
     padding: 15,
