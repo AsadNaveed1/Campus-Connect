@@ -168,10 +168,11 @@ const SocietyPage = () => {
         {merch.map(item => (
           <MerchCard 
             key={item.id} 
-            image={{ uri: item.image }} 
-            title={item.name} 
+            id={item.id}
+            name={item.name} 
             price={item.price} 
-            onPress={() => {}}
+            image={{ uri: item.image }}
+            societyId={societyId}
           />
         ))}
       </View>
@@ -358,8 +359,6 @@ const styles = StyleSheet.create({
     elevation: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // elevation:5,
-    // marginBottom: 0,
     padding: 0,
   },
   postImage: {
