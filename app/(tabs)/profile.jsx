@@ -85,10 +85,10 @@ export default function Profile() {
             <Text variant="titleMedium" style={[styles.universityName, { color: theme.colors.onBackground }]}>
               The University of Hong Kong
             </Text> */}
-            <ImageUploader />
             <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
               {user ? (
                 <>
+                  <ImageUploader />
                   <TextInput
                     style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
                     mode="outlined"
