@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme, Text } from "react-native-paper";
+import { useTheme, Text, IconButton, Searchbar } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
 import { collection, query, where, onSnapshot, getDoc, doc } from 'firebase/firestore';
 import { firebaseDB } from '../firebaseConfig';
 import SearchResult from '../components/SearchResult';
+import { useRouter } from 'expo-router';
 
 export default function Search() {
   const theme = useTheme();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [societies, setSocieties] = useState([]);
   const [events, setEvents] = useState([]);
@@ -41,7 +43,7 @@ export default function Search() {
       const eventsData = await Promise.all(querySnapshot.docs.map(async (docSnapshot) => {
         const eventData = { id: docSnapshot.id, ...docSnapshot.data() };
         const societyDoc = await getDoc(doc(firebaseDB, "societies", eventData.society));
-        const societyName = societyDoc.data().name;
+        const societyName = societyDoc.get("name");
         return { ...eventData, societyName };
       }));
       setEvents(eventsData);
@@ -57,29 +59,39 @@ export default function Search() {
     setSearchQuery(query);
   };
 
+  const handleBackButton = () => {
+    router.back();
+  };
+
+  const handleQRButton = () => {
+    // Add your QR button functionality here
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.header}>
-        <View style={[styles.searchBar, { borderColor: theme.colors.outline, backgroundColor: theme.colors.surface }]}>
-          <Ionicons name="search" size={24} color={theme.colors.onSurface} style={styles.searchIcon} />
-          <TextInput
-            style={[styles.textInput, { color: theme.colors.onSurface }]}
-            placeholder="Search"
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-            autoFocus
-            placeholderTextColor={theme.colors.onSurface}
-            selectionColor={theme.colors.primary}
-          />
-          <TouchableOpacity onPress={() => {}}>
+        <Searchbar
+          placeholder="Search"
+          onChangeText={handleSearchChange}
+          value={searchQuery}
+          style={[styles.searchBar, { backgroundColor: theme.colors.surface }]}
+          icon={() => (
             <Ionicons
-              name="qr-code-outline"
+              name="chevron-back"
               size={24}
               color={theme.colors.onSurface}
-              style={styles.qrIcon}
+              onPress={handleBackButton}
             />
-          </TouchableOpacity>
-        </View>
+          )}
+          inputStyle={{ color: theme.colors.onSurface }}
+          autoFocus
+        />
+        <IconButton
+          icon={() => <Ionicons name="qr-code-outline" size={24} color={theme.colors.onSurface} />}
+          size={24}
+          onPress={handleQRButton}
+          style={[styles.qrButton, { backgroundColor: theme.colors.surface }]}
+        />
       </View>
       <ScrollView style={styles.container}>
         {societies.length > 0 && (
@@ -118,31 +130,19 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 24,
     paddingTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   container: {
     paddingHorizontal: 24,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 30,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    elevation: 5,
-    height: 48,
-  },
-  searchIcon: {
-    marginRight: 8,
-    marginLeft: 4,
-  },
-  textInput: {
     flex: 1,
-    height: '100%',
-    paddingVertical: 0,
   },
-  qrIcon: {
-    marginLeft: 8,
-    marginRight: 4,
+  qrButton: {
+    borderRadius: 50,
+    height: 54,
+    width: 54,
   },
   sectionTitle: {
     fontSize: 18,
