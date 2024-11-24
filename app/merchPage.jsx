@@ -1,27 +1,46 @@
-import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, View, Image, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, ScrollView, View, Image, StyleSheet, Dimensions } from 'react-native';
 import { Text, IconButton, ActivityIndicator } from 'react-native-paper';
 import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { doc, getDoc } from 'firebase/firestore';
+import { firebaseDB } from '../firebaseConfig';
+
+const { width, height } = Dimensions.get('window');
 
 const MerchPage = () => {
   const theme = useTheme();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { merchId } = useLocalSearchParams();
+  const [loading, setLoading] = useState(true);
+  const [merchData, setMerchData] = useState(null);
+  const [societyData, setSocietyData] = useState(null);
 
-  const merchData = {
-    backgroundImage: 'https://via.placeholder.com/400',
-    name: 'Sample Merch',
-    price: 20,
-    available: true,
-    description: 'This is a sample merch description.',
-  };
+  useEffect(() => {
+    const fetchMerchData = async () => {
+      try {
+        const merchDoc = await getDoc(doc(firebaseDB, 'merch', merchId));
+        if (merchDoc.exists()) {
+          const merchData = merchDoc.data();
+          const societyDoc = await getDoc(doc(firebaseDB, 'societies', merchData.society));
+          if (societyDoc.exists()) {
+            setTimeout(() => {
+              setMerchData(merchData);
+              setSocietyData(societyDoc.data());
+              setLoading(false);
+            }, 200);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching merch data:', error);
+      }
+    };
 
-  const societyData = {
-    logo: 'https://via.placeholder.com/80',
-    name: 'Sample Society',
-  };
+    if (merchId) {
+      fetchMerchData();
+    }
+  }, [merchId]);
 
   const handleBackButton = () => {
     router.back();
@@ -40,7 +59,7 @@ const MerchPage = () => {
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={[styles.imageContainer, { backgroundColor: theme.colors.surface }]}>
           <Image
-            source={{ uri: merchData.backgroundImage }}
+            source={{ uri: merchData.image }}
             style={styles.image}
           />
           <IconButton
@@ -63,9 +82,9 @@ const MerchPage = () => {
           <Text variant="bodyMedium" style={[styles.societyName, { color: 'grey' }]}>{societyData.name}</Text>
           <View style={styles.merchDetails}>
             <View style={styles.detailRow}>
-              <Ionicons name={merchData.available ? "checkmark-circle" : "close-circle"} size={16} color={merchData.available ? "green" : "red"} />
-              <Text variant="bodyMedium" style={[styles.detailText, { color: merchData.available ? "green" : "red" }]}>
-                {merchData.available ? "Available" : "Not Available"}
+              <Ionicons name={merchData.availability ? "checkmark-circle" : "close-circle"} size={16} color={merchData.availability ? "green" : "red"} />
+              <Text variant="bodyMedium" style={[styles.detailText, { color: merchData.availability ? "green" : "red" }]}>
+                {merchData.availability ? "Available" : "Not Available"}
               </Text>
             </View>
           </View>
@@ -91,12 +110,12 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: 'relative',
-    width: '100%',
-    height: '60%',
+    width: width,
+    height: height * 0.6,
     overflow: 'hidden',
   },
   image: {
-    resizeMode: 'fill',
+    resizeMode: 'cover',
     width: '100%',
     height: '100%',
   },
@@ -114,7 +133,7 @@ const styles = StyleSheet.create({
   },
   circleImageContainer: {
     position: 'absolute',
-    top: '53%',
+    top: height * 0.53,
     left: 20,
     zIndex: 1,
     width: 80,
@@ -127,6 +146,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   detailsContainer: {
+    borderTopColor: 'lightgrey',
+    borderTopWidth: 1,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 15,

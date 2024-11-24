@@ -17,6 +17,8 @@ const SocietyPage = () => {
   const [societyData, setSocietyData] = useState(null);
   const [categoryName, setCategoryName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState([]);
+  const [merch, setMerch] = useState([]);
 
   useEffect(() => {
     const fetchSocietyData = async () => {
@@ -28,13 +30,35 @@ const SocietyPage = () => {
           if (categoryDoc.exists()) {
             setCategoryName(categoryDoc.data().name);
           }
-          setTimeout(() => {
-            setSocietyData(data);
-            setLoading(false);
-          }, 200);
+          setSocietyData(data);
+          fetchEventDetails(data.events);
+          fetchMerchDetails(data.merch);
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error fetching society data:', error);
+      }
+    };
+
+    const fetchEventDetails = async (eventIds) => {
+      try {
+        const eventPromises = eventIds.map(eventId => getDoc(doc(firebaseDB, 'events', eventId)));
+        const eventDocs = await Promise.all(eventPromises);
+        const eventData = eventDocs.map(eventDoc => ({ id: eventDoc.id, ...eventDoc.data() }));
+        setEvents(eventData);
+      } catch (error) {
+        console.error('Error fetching event details:', error);
+      }
+    };
+
+    const fetchMerchDetails = async (merchIds) => {
+      try {
+        const merchPromises = merchIds.map(merchId => getDoc(doc(firebaseDB, 'merch', merchId)));
+        const merchDocs = await Promise.all(merchPromises);
+        const merchData = merchDocs.map(merchDoc => ({ id: merchDoc.id, ...merchDoc.data() }));
+        setMerch(merchData);
+      } catch (error) {
+        console.error('Error fetching merch details:', error);
       }
     };
 
@@ -56,41 +80,24 @@ const SocietyPage = () => {
   }
 
   const posts = [
-    { id: '1', image: require('../assets/images/hoodie.jpg'), caption: 'Enjoying the society vibes!' },
-    { id: '2', image: require('../assets/images/hoodie.jpg'), caption: 'A great event by the community.' },
-    { id: '3', image: require('../assets/images/hoodie.jpg'), caption: 'Moments that matter. ❤️' },
-    { id: '4', image: require('../assets/images/hoodie.jpg'), caption: 'Stay connected, stay inspired!' },
-  ];
-
-  const items = [
-    { id: 1, image: require('../assets/images/hoodie.jpg'), title: 'Unisex Hoodie', price: 199 },
-    { id: 2, image: require('../assets/images/hoodie.jpg'), title: 'Tote Bag', price: 50 },
-    { id: 3, image: require('../assets/images/hoodie.jpg'), title: 'Water Bottle', price: 75 },
-    { id: 4, image: require('../assets/images/hoodie.jpg'), title: 'T-Shirt', price: 100 },
-    { id: 5, image: require('../assets/images/hoodie.jpg'), title: 'Cap', price: 120 },
-    { id: 6, image: require('../assets/images/hoodie.jpg'), title: 'Sweater', price: 150 },
-  ];
-
-  const events = [
-    {
-      id: '1',
-      date: 'Dec 15, 2023',
-      title: 'Annual Data Science Conference',
-      subtitle: 'Join us for insightful talks',
-      location: 'HKU Main Hall',
-      imageUrl: 'https://example.com/event1.jpg',
-      circleImageUrl: require('../assets/images/hku.png'),
-      onJoinPress: () => alert('Joined the event!'),
+    {id: 1, image: 'https://image.jimcdn.com/app/cms/image/transf/dimension=1190x10000:format=jpg/path/sa6549607c78f5c11/image/ia549b5935af7218d/version/1554203275/glastonbury-festival-best-summer-music-festivals.jpg',
+      caption: 'This is a wonderful moment captured during our recent society event. The energy and enthusiasm of our members were truly inspiring. We had a fantastic time engaging in various activities, sharing knowledge, and building lasting connections. The event was a testament to the vibrant community we have built together. Looking forward to many more such memorable moments with all of you. Stay tuned for more updates and events. #SocietyLife #Community #Events #Memories', 
+      numLikes: 106,
     },
-    {
-      id: '2',
-      date: 'Jan 10, 2024',
-      title: 'Workshop on Machine Learning',
-      subtitle: 'Hands-on experience and networking',
-      location: 'Room 202',
-      imageUrl: 'https://example.com/event2.jpg',
-      circleImageUrl: require('../assets/images/hku.png'),
-      onJoinPress: () => alert('Joined the workshop!'),
+    
+    { id: 2, image: 'https://www.anarapublishing.com/wp-content/uploads/elementor/thumbs/photo-1506157786151-b8491531f063-o67khcr8g8y3egfjh6eh010ougiroekqaq5cd8ly88.jpeg', 
+      caption: 'A great event by the community.',
+      numLikes: 92,
+    },
+
+    { id: 3, image: 'https://s1.it.atcdn.net/wp-content/uploads/2020/01/Hero-Holi-Festival-India-800x600.jpg', 
+      caption: 'Moments that matter.',
+      numLikes: 37,
+    },
+
+    { id: 4, image: 'https://www.discoverhongkong.com/content/dam/dhk/intl/explore/culture/mid-autumn-festival-traditions-festivities-and-delicacies/mid-autumn-festival-traditions-festivities-and-delicacies-1920x1080.jpg', 
+      caption: 'Stay connected, stay inspired!',
+      numLikes: 54,
     },
   ];
 
@@ -148,6 +155,7 @@ const SocietyPage = () => {
             key={item.id} 
             image={item.image} 
             caption={item.caption} 
+            numLikes={item.numLikes}
           />
         ))}
       </View>
@@ -157,11 +165,11 @@ const SocietyPage = () => {
   const renderShop = () => (
     <View style={styles.shopContainer}>
       <View style={styles.shopRow}>
-        {items.map(item => (
+        {merch.map(item => (
           <MerchCard 
             key={item.id} 
-            image={item.image} 
-            title={item.title} 
+            image={{ uri: item.image }} 
+            title={item.name} 
             price={item.price} 
             onPress={() => {}}
           />
@@ -175,10 +183,11 @@ const SocietyPage = () => {
       {events.map(event => (
         <View key={event.id}>
           <EventCard
-            date={event.date}
-            title={event.title}
+            eventId={event.id}
+            date={new Date(event.time.seconds * 1000).toLocaleDateString()}
+            title={event.name}
             location={event.location}
-            imageUrl={'https://example.com/event.jpg'}
+            imageUrl={event.backgroundImage}
             minimal
           />
         </View>
@@ -334,37 +343,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   postsContainer: {
-    padding: 24,
+    padding: 0,
   },
   postsRow: {
     flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   postContainer: {
     borderRadius: 10,
     borderColor: '#ddd',
     borderWidth: 1,
     backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 1,
-    marginBottom: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // elevation:5,
+    // marginBottom: 0,
+    padding: 0,
   },
   postImage: {
     width: '100%',
     height: 200,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-  },
-  caption: {
-    marginTop: 0,
-    marginBottom: 0,
-    paddingBottom: 10,
-    marginLeft: 8,
-    fontSize: 14,
-    textAlign: 'left',
-    padding: 8,
   },
   shopContainer: {
     paddingHorizontal: 20,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Image, StyleSheet } from 'react-native';
+import { SafeAreaView, ScrollView, View, Image, StyleSheet, Dimensions } from 'react-native';
 import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,9 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { doc, getDoc } from 'firebase/firestore';
 import { firebaseDB } from '../firebaseConfig';
+import MapCard from '../components/MapCard';
+
+const { height: screenHeight } = Dimensions.get('window');
 
 const EventPage = () => {
   const { eventId } = useLocalSearchParams();
@@ -16,6 +19,7 @@ const EventPage = () => {
   const [eventData, setEventData] = useState(null);
   const [societyData, setSocietyData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hasJoined, setHasJoined] = useState(false);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -86,7 +90,7 @@ const EventPage = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
         <View style={[styles.imageContainer, { backgroundColor: theme.colors.surface }]}>
           <Image
             source={{ uri: eventData.backgroundImage }}
@@ -124,17 +128,27 @@ const EventPage = () => {
               <Text variant="bodyMedium" style={[styles.detailText, { color: 'grey' }]}>{eventData.location}</Text>
             </View>
           </View>
-          <ScrollView style={styles.descriptionContainer} showsVerticalScrollIndicator={false}>
+          <View style={styles.descriptionContainer}>
             <Text variant="bodyMedium" style={[styles.descriptionText, { color: theme.colors.onSurface }]}>
               {eventData.description}
             </Text>
-          </ScrollView>
+          </View>
         </View>
+        <MapCard
+          latitude={eventData?.latitude || 22.3193}
+          longitude={eventData?.longitude || 114.1694}
+          title={eventData?.name || ""}
+          description={eventData?.location || ""}
+        />
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <Button mode="contained" onPress={() => {}} style={styles.joinButton}>
-          Join
-        </Button>
+      <Button mode="contained" onPress={() => setHasJoined(!hasJoined)} style={styles.joinButton}>
+        {hasJoined ? (
+          'Joined'
+        ) : (
+          'Join'
+        )}
+      </Button>
         <IconButton
           icon={() => (
             <Ionicons
@@ -160,14 +174,15 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
+    paddingBottom: 16,
   },
   imageContainer: {
     position: 'relative',
     width: '100%',
-    height: '40%',
+    height: screenHeight * 0.4,
   },
   image: {
-    resizeMode: 'fill',
+    resizeMode: 'cover',
     width: '100%',
     height: '100%',
   },
@@ -185,7 +200,7 @@ const styles = StyleSheet.create({
   },
   circleImageContainer: {
     position: 'absolute',
-    top: '33%',
+    top: screenHeight * 0.33,
     left: 20,
     zIndex: 1,
     width: 80,
@@ -241,7 +256,6 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   descriptionContainer: {
-    maxHeight: 200,
     marginTop: 15,
   },
   descriptionText: {

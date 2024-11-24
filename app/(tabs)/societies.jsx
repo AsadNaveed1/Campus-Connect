@@ -58,18 +58,26 @@ export default function Societies() {
       <View style={styles.header}>
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>Societies</Text>
         <IconButton
-          icon={() => <Ionicons name="add" size={24} color={theme.colors.onBackground} />}
+          icon={() => <Ionicons name="" size={24} color={theme.colors.onBackground} />}
           onPress={() => {}}
         />
       </View>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>My Societies</Text>
         <ScrollView horizontal contentContainerStyle={styles.horizontalScroll} showsHorizontalScrollIndicator={false}>
-          <MySocietyCard style={styles.card} logo={require('../../assets/images/hku.png')} name="Society 1" />
-          <MySocietyCard style={styles.card} logo={require('../../assets/images/hku.png')} name="Society 2" />
-          <MySocietyCard style={styles.card} logo={require('../../assets/images/hku.png')} name="Society 3" />
-          <MySocietyCard style={styles.card} logo={require('../../assets/images/hku.png')} name="Society 4" />
-          <MySocietyCard style={styles.card} logo={require('../../assets/images/hku.png')} name="Society 5" />
+          {societies
+          .map(society => {
+            const category = categories[society.category];
+            return (
+              <MySocietyCard
+                key={society.id}
+                societyId={society.id}
+                style={styles.card}
+                name={society.name}
+                logo={society.logo}
+              />
+            );
+          })}
         </ScrollView>
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>All Societies</Text>
         <ScrollView

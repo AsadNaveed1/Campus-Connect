@@ -28,7 +28,6 @@ export default function Events() {
           societyLogo: societyData.logo,
         };
       }));
-      // Sort events by timestamp
       eventsData.sort((a, b) => a.time.seconds - b.time.seconds);
       setEvents(eventsData);
     }, (error) => {
@@ -45,7 +44,7 @@ export default function Events() {
           Events
         </Text>
         <IconButton
-          icon={() => <Ionicons name="add" size={24} color={theme.colors.onBackground} />}
+          icon={() => <Ionicons name="" size={24} color={theme.colors.onBackground} />}
           onPress={() => {}}
         />
       </View>
@@ -57,7 +56,7 @@ export default function Events() {
           horizontal 
           showsHorizontalScrollIndicator={false} 
           style={styles.myEventsScroll}>
-          <MyEventCard
+          {/* <MyEventCard
             circleImageUrl={require('../../assets/images/hku.png')}
             eventName="Event Name"
             societyName="Society Name"
@@ -74,7 +73,17 @@ export default function Events() {
             eventName="Yet Another Event"
             societyName="Cool Society"
             eventDate="05/10/2024"
-          />
+          /> */}
+          {events.map((event) => (
+            <MyEventCard
+              key={event.id}
+              eventId={event.id}
+              eventDate={new Date(event.time.seconds * 1000).toLocaleDateString()}
+              eventName={event.name}
+              societyName={event.societyName}
+              circleImageUrl={{ uri: event.societyLogo }}
+            />
+          ))}
         </ScrollView>
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
           All Events

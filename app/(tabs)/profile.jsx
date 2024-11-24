@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useUserContext } from "../../contexts/UserContext";
 import { firebaseDB } from "../../firebaseConfig";
+import ImageUploader from "../../components/ImageUploader";
 
 export default function Profile() {
   const auth = getAuth();
@@ -80,10 +81,11 @@ export default function Profile() {
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <View style={styles.content}>
-            <Image source={require('../../assets/images/hku.png')} style={styles.logo} />
+            {/* <Image source={require('../../assets/images/hku.png')} style={styles.logo} />
             <Text variant="titleMedium" style={[styles.universityName, { color: theme.colors.onBackground }]}>
               The University of Hong Kong
-            </Text>
+            </Text> */}
+            <ImageUploader />
             <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
               {user ? (
                 <>

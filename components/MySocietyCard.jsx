@@ -8,7 +8,7 @@ export default function MySocietyCard(props) {
   const router = useRouter();
 
   const handlePress = () => {
-    router.push('/societyPage');
+    router.push(`/societyPage?societyId=${props.societyId}`);
   };
 
   return (
@@ -23,9 +23,15 @@ export default function MySocietyCard(props) {
       ]}
     >
       <View style={[styles.logoContainer, { borderColor: theme.colors.surface }]}>
-        <Image source={props.logo} style={styles.logo} resizeMode="contain" />
+        <Image source={{ uri:props.logo}} style={styles.logo} resizeMode="contain" />
       </View>
-      <Text style={[styles.name, { color: theme.colors.onSurface }]}>{props.name}</Text>
+      <Text 
+        style={[styles.name, { color: theme.colors.onSurface }]}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {props.name}
+      </Text>
     </Pressable>
   );
 }

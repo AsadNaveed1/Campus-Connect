@@ -3,16 +3,10 @@ import { View, Text, Image, StyleSheet, Pressable, Animated } from 'react-native
 import { useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
-const MerchCard = () => {
+const MerchCard = ({ id, name, price, image, societyId }) => {
   const theme = useTheme();
   const router = useRouter();
   const scale = new Animated.Value(1);
-
-  const merchData = {
-    name: 'Sample Merch',
-    fee: '$20',
-    imageUrl: 'https://via.placeholder.com/120',
-  };
 
   const handlePressIn = () => {
     Animated.spring(scale, {
@@ -29,7 +23,7 @@ const MerchCard = () => {
   };
 
   const handlePress = () => {
-    router.push({ pathname: "/merchPage" });
+    router.push({ pathname: "/merchPage", params: { merchId: id, societyId } });
   };
 
   return (
@@ -41,15 +35,15 @@ const MerchCard = () => {
       >
         <Animated.View style={[styles.cardContainer, { backgroundColor: theme.colors.surface, transform: [{ scale }] }]}>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: merchData.imageUrl }} style={styles.image} />
+            <Image source={ image } style={styles.image} />
             <View style={[styles.feeBadge, { backgroundColor: `${theme.colors.background}` }]}>
-              <Text style={[styles.feeText, { color: theme.colors.onBackground }]}>{merchData.fee}</Text>
+              <Text style={[styles.feeText, { color: theme.colors.onBackground }]}>{`$${price}`}</Text>
             </View>
           </View>
         </Animated.View>
       </Pressable>
       <View style={styles.labelContainer}>
-        <Text style={[styles.name, { color: theme.colors.onSurface }]}>{merchData.name}</Text>
+        <Text style={[styles.name, { color: theme.colors.onSurface }]}>{name}</Text>
       </View>
     </View>
   );

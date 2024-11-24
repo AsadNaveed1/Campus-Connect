@@ -1,23 +1,50 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, Pressable, Animated } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
-const MyEventCard = ({ circleImageUrl, eventName, societyName, eventDate }) => {
+const MyEventCard = ({ eventId, circleImageUrl, eventName, societyName, eventDate }) => {
   const theme = useTheme();
+  const router = useRouter();
+  const scale = new Animated.Value(1);
+
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePress = () => {
+    router.push({ pathname: "/eventPage", params: { eventId } });
+  };
 
   return (
-    <View style={[styles.cardContainer, { backgroundColor: theme.colors.surface }]}>
-      <View style={styles.circleOverlay}>
-        <Image source={circleImageUrl} style={styles.circleImage} />
-      </View>
-      <View style={styles.contentContainer}>
-        <Text style={styles.eventName} numberOfLines={1} ellipsizeMode="tail">
-          {eventName}
-        </Text>
-        <Text style={styles.societyName}>{societyName}</Text>
-        <Text style={styles.eventDate}>{eventDate}</Text>
-      </View>
-    </View>
+    <Pressable
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      onPress={handlePress}
+    >
+      <Animated.View style={[styles.cardContainer, { backgroundColor: theme.colors.surface, transform: [{ scale }] }]}>
+        <View style={styles.circleOverlay}>
+          <Image source={ circleImageUrl } style={styles.circleImage} />
+        </View>
+        <View style={styles.contentContainer}>
+          <Text style={styles.eventName} numberOfLines={1} ellipsizeMode="tail">
+            {eventName}
+          </Text>
+          <Text style={styles.societyName}>{societyName}</Text>
+          <Text style={styles.eventDate}>{eventDate}</Text>
+        </View>
+      </Animated.View>
+    </Pressable>
   );
 };
 
@@ -43,12 +70,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
-    padding: 10,
   },
   circleImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   contentContainer: {
     flex: 1,
