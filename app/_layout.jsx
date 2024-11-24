@@ -22,7 +22,7 @@ export default function RootLayout() {
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="eventPage" options={{ headerShown: false }} />
               <Stack.Screen name="societyPage" options={{ headerShown: false }} />
-              <Stack.Screen name="shopitemPage" options={{ headerShown: false }} />
+              <Stack.Screen name="merchPage" options={{ headerShown: false }} />
             </Stack>
           </SafeAreaProvider>
         </PaperProvider>

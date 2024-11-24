@@ -6,7 +6,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import { firebaseDB } from '../firebaseConfig';
 import EventCard from '../components/EventCard';
-import ShopCard from '../components/ShopCard';
+import MerchCard from '../components/MerchCard';
+import PostCard from '../components/PostCard';
 
 const SocietyPage = () => {
   const theme = useTheme();
@@ -143,12 +144,11 @@ const SocietyPage = () => {
     <View style={styles.postsContainer}>
       <View style={styles.postsRow}>
         {posts.map(item => (
-          <TouchableOpacity key={item.id} style={styles.postContainer} activeOpacity={0.8}>
-            <Image source={item.image} style={styles.postImage} />
-            <Text style={[styles.caption, { color: theme.colors.onSurface }]} numberOfLines={2}>
-              {item.caption}
-            </Text>
-          </TouchableOpacity>
+          <PostCard 
+            key={item.id} 
+            image={item.image} 
+            caption={item.caption} 
+          />
         ))}
       </View>
     </View>
@@ -158,7 +158,7 @@ const SocietyPage = () => {
     <View style={styles.shopContainer}>
       <View style={styles.shopRow}>
         {items.map(item => (
-          <ShopCard 
+          <MerchCard 
             key={item.id} 
             image={item.image} 
             title={item.title} 
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   postsContainer: {
-    padding: 8,
+    padding: 24,
   },
   postsRow: {
     flexDirection: 'column',
@@ -367,27 +367,17 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   shopContainer: {
-    padding: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   shopRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  shopCard: {
-    width: '48%',
-    marginBottom: 16,
-    padding: 5,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    alignItems: 'center',
-  },
   eventsContainer: {
-    padding: 10,
+    paddingHorizontal: 24,
+    paddingVertical: 16,
   },
   joinButton: {
     marginBottom: 8,
