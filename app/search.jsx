@@ -14,6 +14,7 @@ export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const [societies, setSocieties] = useState([]);
   const [events, setEvents] = useState([]);
+  const [searchBarHeight, setSearchBarHeight] = useState(0);
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -64,7 +65,6 @@ export default function Search() {
   };
 
   const handleQRButton = () => {
-    // Add your QR button functionality here
   };
 
   return (
@@ -85,12 +85,16 @@ export default function Search() {
           )}
           inputStyle={{ color: theme.colors.onSurface }}
           autoFocus
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            setSearchBarHeight(height);
+          }}
         />
         <IconButton
           icon={() => <Ionicons name="qr-code-outline" size={24} color={theme.colors.onSurface} />}
           size={24}
           onPress={handleQRButton}
-          style={[styles.qrButton, { backgroundColor: theme.colors.surface }]}
+          style={[styles.qrButton, { backgroundColor: theme.colors.surface, height: searchBarHeight, width: searchBarHeight }]}
         />
       </View>
       <ScrollView style={styles.container}>
@@ -141,8 +145,6 @@ const styles = StyleSheet.create({
   },
   qrButton: {
     borderRadius: 50,
-    height: 54,
-    width: 54,
   },
   sectionTitle: {
     fontSize: 18,
