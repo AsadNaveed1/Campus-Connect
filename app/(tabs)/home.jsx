@@ -18,7 +18,7 @@ export default function Home() {
       category: "Art",
       categoryColor: "#FFD700",
       categoryTextColor: "#000",
-      logoUrl: "https://via.placeholder.com/80",
+      logoUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
     },
     {
       societyId: "2",
@@ -27,7 +27,7 @@ export default function Home() {
       category: "Music",
       categoryColor: "#FF6347",
       categoryTextColor: "#FFF",
-      logoUrl: "https://via.placeholder.com/80",
+      logoUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
     },
     {
       societyId: "3",
@@ -36,7 +36,7 @@ export default function Home() {
       category: "Tech",
       categoryColor: "#00BFFF",
       categoryTextColor: "#FFF",
-      logoUrl: "https://via.placeholder.com/80",
+      logoUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
     },
   ];
 
@@ -47,8 +47,8 @@ export default function Home() {
       title: "Art Exhibition",
       subtitle: "Explore local artworks",
       location: "Art Hall",
-      imageUrl: "https://via.placeholder.com/200x120",
-      circleImageUrl: "https://via.placeholder.com/60",
+      imageUrl: "https://res.allmacwallpaper.com/get/macbook-air-wallpapers/Acrylic-paint-abstract-ph/19079-720.jpg",
+      circleImageUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
     },
     {
       eventId: "2",
@@ -56,8 +56,8 @@ export default function Home() {
       title: "Music Fest",
       subtitle: "Live performances",
       location: "Auditorium",
-      imageUrl: "https://via.placeholder.com/200x120",
-      circleImageUrl: "https://via.placeholder.com/60",
+      imageUrl: "https://res.allmacwallpaper.com/get/macbook-air-wallpapers/Acrylic-paint-abstract-ph/19079-720.jpg",
+      circleImageUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
     },
     {
       eventId: "3",
@@ -65,8 +65,8 @@ export default function Home() {
       title: "Tech Meetup",
       subtitle: "Networking event",
       location: "Conference Room",
-      imageUrl: "https://via.placeholder.com/200x120",
-      circleImageUrl: "https://via.placeholder.com/60",
+      imageUrl: "https://res.allmacwallpaper.com/get/macbook-air-wallpapers/Acrylic-paint-abstract-ph/19079-720.jpg",
+      circleImageUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
     },
   ];
 

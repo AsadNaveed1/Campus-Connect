@@ -280,9 +280,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 24,
-    elevation: 10,
-    borderWidth: 1,
-    borderColor: '#CDCDCD',
+    elevation: 5,
     borderBottomWidth: 0,
   },
   buttonContainer: {
