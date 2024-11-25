@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   map: {
-    width: 330,
+    flex: 1,
     height: 250,
   },
 });
