@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground, SafeAreaView } from 'react-native';
-import { useTheme, Text, IconButton, Button, ActivityIndicator } from 'react-native-paper';
+import { View, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground, SafeAreaView, Dimensions } from 'react-native';
+import { useTheme, Text, IconButton, Button, ActivityIndicator, Dialog, Portal } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
@@ -8,6 +8,7 @@ import { firebaseDB } from '../firebaseConfig';
 import EventCard from '../components/EventCard';
 import MerchCard from '../components/MerchCard';
 import PostCard from '../components/PostCard';
+import QRCode from 'react-native-qrcode-svg';
 
 const SocietyPage = () => {
   const theme = useTheme();
@@ -19,6 +20,10 @@ const SocietyPage = () => {
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [merch, setMerch] = useState([]);
+  const [qrVisible, setQrVisible] = useState(false);
+
+  const screenWidth = Dimensions.get('window').width;
+  const qrCodeSize = screenWidth * 0.6; // Adjust the size as needed
 
   useEffect(() => {
     const fetchSocietyData = async () => {
@@ -69,6 +74,10 @@ const SocietyPage = () => {
 
   const handleBackButton = () => {
     router.back();
+  };
+
+  const toggleQrDialog = () => {
+    setQrVisible(!qrVisible);
   };
 
   if (loading) {
@@ -133,6 +142,7 @@ const SocietyPage = () => {
             icon={() => <Ionicons name="qr-code" size={16} color="grey" />}
             size={18}
             style={[styles.qrButton, { backgroundColor: 'rgba(128, 128, 128, 0.1)' }]}
+            onPress={toggleQrDialog}
           />
         </View>
         <Button mode="text" style={styles.joinButton}>Join Us</Button>
@@ -227,6 +237,24 @@ const SocietyPage = () => {
         {activeTab === 'Shop' && renderShop()}
         {activeTab === 'Events' && renderEvents()}
       </ScrollView>
+
+      <Portal>
+        <Dialog visible={qrVisible} dismissable={false} style={styles.qrDialog}>
+          <Dialog.Title>
+            <Text variant='titleMedium' style={styles.qrDialogTitle}>Society Code</Text>
+          </Dialog.Title>
+          <Dialog.Content style={styles.qrDialogContent}>
+            <View>
+              <QRCode value={'soc:' + societyId} size={qrCodeSize} />
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions style={styles.qrDialogActions}>
+            <Button onPress={toggleQrDialog}>
+              Close
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 };
@@ -253,14 +281,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 20,
     zIndex: 1,
-  },
-  circle: {
-    width: 40,
-    height: 40,
-    borderRadius: 12.5,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   logoContainer: {
     width: 90,
@@ -316,15 +336,6 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     fontSize: 10,
   },
-  section: {
-    padding: 16,
-    marginTop: 20,
-    borderRadius: 8,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -351,22 +362,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  postContainer: {
-    borderRadius: 10,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    backgroundColor: '#fff',
-    elevation: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 0,
-  },
-  postImage: {
-    width: '100%',
-    height: 200,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
   shopContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -387,6 +382,22 @@ const styles = StyleSheet.create({
   qrButton: {
     borderRadius: 20,
     padding: 5,
+  },
+  qrDialog: {
+    borderRadius: 15,
+  },
+  qrDialogTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  qrDialogContent: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  qrDialogActions: {
+    justifyContent: 'center',
   },
 });
 
