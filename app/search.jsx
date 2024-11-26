@@ -65,6 +65,7 @@ export default function Search() {
   };
 
   const handleQRButton = () => {
+    router.replace("qrScanner");
   };
 
   return (

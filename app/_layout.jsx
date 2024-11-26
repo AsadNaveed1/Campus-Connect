@@ -19,6 +19,7 @@ export default function RootLayout() {
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="register" options={{ headerShown: false }} />
               <Stack.Screen name="search" options={{ headerShown: false }} />
+              <Stack.Screen name="qrScanner" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="eventPage" options={{ headerShown: false }} />
               <Stack.Screen name="societyPage" options={{ headerShown: false }} />
