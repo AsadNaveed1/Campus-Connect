@@ -54,15 +54,25 @@ const EventPage = () => {
     }),
   });
 
+  const requestNotificationPermissions = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    return status === 'granted';
+  };
+
   const enableNotifications = async () => {
-    setNotificationsEnabled(true);
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Notifications Enabled",
-        body: "You will receive notifications for this event.",
-      },
-      trigger: null,
-    });
+    const hasPermission = await requestNotificationPermissions();
+    if (hasPermission) {
+      setNotificationsEnabled(true);
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Notifications Enabled",
+          body: "You will receive notifications for this event.",
+        },
+        trigger: null,
+      });
+    } else {
+      console.log('Notification permissions not granted');
+    }
   };
 
   const disableNotifications = async () => {
