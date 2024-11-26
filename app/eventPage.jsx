@@ -134,12 +134,12 @@ const EventPage = () => {
             </Text>
           </View>
         </View>
-        <MapCard
+        {/* <MapCard
           latitude={eventData?.latitude || 22.3193}
           longitude={eventData?.longitude || 114.1694}
           title={eventData?.name || ""}
           description={eventData?.location || ""}
-        />
+        /> */}
       </ScrollView>
       <View style={styles.buttonContainer}>
       <Button mode="contained" onPress={() => setHasJoined(!hasJoined)} style={styles.joinButton}>
