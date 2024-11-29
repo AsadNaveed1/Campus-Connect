@@ -1,11 +1,12 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { IconButton } from 'react-native-paper';
+import { IconButton, Text, useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function QRScanner() {
+  const theme = useTheme();
   const [permission, requestPermission] = useCameraPermissions();
   const [hasPermission, setHasPermission] = useState(null);
 
@@ -17,10 +18,10 @@ export default function QRScanner() {
   }, []);
 
   if (hasPermission === null) {
-    return <View />;
+    return <View style={[styles.container, { backgroundColor: theme.colors.background }]}></View>;
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return <View style={[styles.container, { backgroundColor: theme.colors.background }]}><Text>Please enable camera permissions to use this feature.</Text></View>;
   }
 
   const handleBackButton = () => {
@@ -28,7 +29,7 @@ export default function QRScanner() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <CameraView
         style={styles.camera}
         barcodeScannerSettings={{
@@ -46,6 +47,10 @@ export default function QRScanner() {
         }}
       >
       </CameraView>
+      <View style={styles.overlayContainer}>
+        <Ionicons name="qr-code-outline" size={18} color="white" />
+        <Text style={styles.overlayText}>Scan code</Text>
+      </View>
       <IconButton
         icon={() => <Ionicons name="chevron-back" size={24} color="#fff" />}
         size={24}
@@ -63,6 +68,23 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
+  },
+  overlayContainer: {
+    position: 'absolute',
+    height: '10%',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 8,
+  },
+  overlayText: {
+    fontSize: 18,
+    color: 'white',
+    marginLeft: 8,
   },
   backButton: {
     position: 'absolute',

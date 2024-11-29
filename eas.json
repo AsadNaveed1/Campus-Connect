@@ -10,6 +10,12 @@
       "android": {
         "buildType": "apk"
       }
+    },
+    "final": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     }
   },
   "submit": {

@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     elevation: 5,
     marginVertical: 10,
+    minWidth: '90%',
   },
   imageContainer: {
     position: 'relative',

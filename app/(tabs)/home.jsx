@@ -4,71 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme, Text, IconButton } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import SearchButton from "../../components/SearchButton";
-import EventCard from "../../components/EventCard";
-import SocietyCard from "../../components/SocietyCard";
+import MagicShake from "../../components/MagicShake";
 
 export default function Home() {
   const theme = useTheme();
-
-  const societies = [
-    {
-      societyId: "1",
-      name: "Art Society",
-      members: 120,
-      category: "Art",
-      categoryColor: "#FFD700",
-      categoryTextColor: "#000",
-      logoUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
-    },
-    {
-      societyId: "2",
-      name: "Music Club",
-      members: 80,
-      category: "Music",
-      categoryColor: "#FF6347",
-      categoryTextColor: "#FFF",
-      logoUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
-    },
-    {
-      societyId: "3",
-      name: "Tech Society",
-      members: 200,
-      category: "Tech",
-      categoryColor: "#00BFFF",
-      categoryTextColor: "#FFF",
-      logoUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
-    },
-  ];
-
-  const events = [
-    {
-      eventId: "1",
-      date: "24 Nov",
-      title: "Art Exhibition",
-      subtitle: "Explore local artworks",
-      location: "Art Hall",
-      imageUrl: "https://res.allmacwallpaper.com/get/macbook-air-wallpapers/Acrylic-paint-abstract-ph/19079-720.jpg",
-      circleImageUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
-    },
-    {
-      eventId: "2",
-      date: "25 Nov",
-      title: "Music Fest",
-      subtitle: "Live performances",
-      location: "Auditorium",
-      imageUrl: "https://res.allmacwallpaper.com/get/macbook-air-wallpapers/Acrylic-paint-abstract-ph/19079-720.jpg",
-      circleImageUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
-    },
-    {
-      eventId: "3",
-      date: "26 Nov",
-      title: "Tech Meetup",
-      subtitle: "Networking event",
-      location: "Conference Room",
-      imageUrl: "https://res.allmacwallpaper.com/get/macbook-air-wallpapers/Acrylic-paint-abstract-ph/19079-720.jpg",
-      circleImageUrl: "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/times-squared-retro-abstract-of-squares-in-red-blue-yellow-green-black-lynnie-lang.jpg",
-    },
-  ];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -83,34 +22,10 @@ export default function Home() {
       </View>
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
-          Recommended Societies
-        </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.horizontalScroll}
-        >
-          {societies.map((society) => (
-            <View key={society.societyId} style={styles.cardWrapper}>
-              <SocietyCard {...society} />
-            </View>
-          ))}
-        </ScrollView>
-
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
-          Recommended Events
-        </Text>
-        <View style={styles.verticalScroll}>
-          {events.map((event) => (
-            <View key={event.eventId}>
-              <EventCard {...event} />
-            </View>
-          ))}
-        </View>
       </ScrollView>
 
       <SearchButton />
+      <MagicShake />
     </SafeAreaView>
   );
 }
@@ -130,26 +45,5 @@ const styles = StyleSheet.create({
   container: {
     padding: 24,
     paddingBottom: 100,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  horizontalScroll: {
-    padding: 2,
-    marginBottom: 16,
-  },
-  cardWrapper: {
-    marginRight: 12,
-  },
-  verticalScroll: {
-    width: '100%',
-    paddingBottom: 125,
-  },
-  eventCardWrapper: {
-    marginBottom: 16,
-    width: '100%',
-    alignItems: 'center',
   },
 });

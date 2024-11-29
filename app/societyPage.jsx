@@ -23,7 +23,7 @@ const SocietyPage = () => {
   const [qrVisible, setQrVisible] = useState(false);
 
   const screenWidth = Dimensions.get('window').width;
-  const qrCodeSize = screenWidth * 0.6; // Adjust the size as needed
+  const qrCodeSize = screenWidth * 0.6;
 
   useEffect(() => {
     const fetchSocietyData = async () => {
