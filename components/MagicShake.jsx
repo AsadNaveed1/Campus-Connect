@@ -3,7 +3,7 @@ import { View, StyleSheet, Modal } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import { Button, Text, useTheme, IconButton } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import { firebaseDB } from '../firebaseConfig';
 
@@ -14,6 +14,7 @@ const MagicShake = () => {
   const [visible, setVisible] = useState(false);
   const [suggestion, setSuggestion] = useState(null);
   const [phrase, setPhrase] = useState("");
+  const [society, setSociety] = useState(null);
   const router = useRouter();
   const theme = useTheme();
 
@@ -45,6 +46,12 @@ const MagicShake = () => {
     const randomSuggestion = await fetchRandomSuggestion();
     setSuggestion(randomSuggestion);
     setPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
+    if (randomSuggestion.type === 'Event') {
+      const societyDoc = await getDoc(doc(firebaseDB, 'societies', randomSuggestion.society));
+      if (societyDoc.exists()) {
+        setSociety(societyDoc.data());
+      }
+    }
     setVisible(true);
   };
 
@@ -75,6 +82,12 @@ const MagicShake = () => {
     const randomSuggestion = await fetchRandomSuggestion();
     setSuggestion(randomSuggestion);
     setPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
+    if (randomSuggestion.type === 'Event') {
+      const societyDoc = await getDoc(doc(firebaseDB, 'societies', randomSuggestion.society));
+      if (societyDoc.exists()) {
+        setSociety(societyDoc.data());
+      }
+    }
   };
 
   return (
@@ -99,6 +112,11 @@ const MagicShake = () => {
                 <Text style={[styles.modalText, { color: theme.colors.onSurface, fontSize: 24, fontWeight: 'bold', textAlign: 'center' }]}>
                   {suggestion.name}
                 </Text>
+                {suggestion.type === 'Event' && society && (
+                  <Text style={[styles.modalText, { color: theme.colors.onSurface, textAlign: 'center' }]}>
+                    {`${society.name}`}
+                  </Text>
+                )}
                 <View style={styles.modalActions}>
                   <Button mode="contained" onPress={handleGoToPage} style={styles.modalButton}>
                     {`Go to ${suggestion.type}`}
