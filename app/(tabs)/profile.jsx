@@ -226,6 +226,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   title: {
+    marginTop: 8,
     fontWeight: 'bold',
   },
   content: {

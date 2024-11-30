@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme, Text, IconButton, Chip } from "react-native-paper";
+import { useTheme, Text, Chip } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
@@ -57,10 +57,6 @@ export default function Societies() {
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.header}>
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>Societies</Text>
-        <IconButton
-          icon={() => <Ionicons name="" size={24} color={theme.colors.onBackground} />}
-          onPress={() => {}}
-        />
       </View>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>My Societies</Text>
@@ -140,6 +136,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   title: {
+    marginTop: 8,
     fontWeight: 'bold',
   },
   container: {

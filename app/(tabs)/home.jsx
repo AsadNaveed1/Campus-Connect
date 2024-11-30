@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme, Text, IconButton } from "react-native-paper";
+import { useTheme, Text } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import SearchButton from "../../components/SearchButton";
 import MagicShake from "../../components/MagicShake";
@@ -15,10 +15,6 @@ export default function Home() {
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
           Home
         </Text>
-        <IconButton
-          icon={() => <Ionicons name="" size={24} color={theme.colors.onBackground} />}
-          onPress={() => {}}
-        />
       </View>
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -40,6 +36,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   title: {
+    marginTop: 8,
     fontWeight: "bold",
   },
   container: {

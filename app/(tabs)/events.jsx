@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthContext } from "../../contexts/AuthContext";
-import { useTheme, Text, IconButton } from "react-native-paper";
+import { useTheme, Text } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
 import EventCard from "../../components/EventCard";
 import MyEventCard from "../../components/MyEventCard";
@@ -43,10 +43,6 @@ export default function Events() {
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
           Events
         </Text>
-        <IconButton
-          icon={() => <Ionicons name="" size={24} color={theme.colors.onBackground} />}
-          onPress={() => {}}
-        />
       </View>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}> 
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
@@ -118,6 +114,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   title: {
+    marginTop: 8,
     fontWeight: 'bold',
   },
   container: {
