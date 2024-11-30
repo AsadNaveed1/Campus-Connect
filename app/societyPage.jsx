@@ -239,20 +239,16 @@ const SocietyPage = () => {
       </ScrollView>
 
       <Portal>
-        <Dialog visible={qrVisible} dismissable={false} style={styles.qrDialog}>
+        <Dialog visible={qrVisible} onDismiss={() => toggleQrDialog()} style={styles.qrDialog}>
           <Dialog.Title>
-            <Text variant='titleMedium' style={styles.qrDialogTitle}>Society Code</Text>
+            <Text style={styles.qrDialogTitle}>Society Code</Text>
           </Dialog.Title>
           <Dialog.Content style={styles.qrDialogContent}>
             <View>
               <QRCode value={'soc:' + societyId} size={qrCodeSize} />
             </View>
           </Dialog.Content>
-          <Dialog.Actions style={styles.qrDialogActions}>
-            <Button onPress={toggleQrDialog}>
-              Close
-            </Button>
-          </Dialog.Actions>
+          <Dialog.Actions></Dialog.Actions>
         </Dialog>
       </Portal>
     </SafeAreaView>

@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useUserContext } from "../../contexts/UserContext";
 import { firebaseDB } from "../../firebaseConfig";
-import ImageUploader from "../../components/ImageUploader";
+import EditableImage from "../../components/EditableImage";
 
 export default function Profile() {
   const auth = getAuth();
@@ -81,14 +81,12 @@ export default function Profile() {
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <View style={styles.content}>
-            {/* <Image source={require('../../assets/images/hku.png')} style={styles.logo} />
-            <Text variant="titleMedium" style={[styles.universityName, { color: theme.colors.onBackground }]}>
-              The University of Hong Kong
-            </Text> */}
             <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
               {user ? (
                 <>
-                  <ImageUploader />
+                  <View style={styles.imageContainer}>
+                    <EditableImage imageId={auth.currentUser.email} imagePath={'users/profilePictures'} editable={isEditable} />
+                  </View>
                   <TextInput
                     style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
                     mode="outlined"
@@ -259,5 +257,12 @@ const styles = StyleSheet.create({
   },
   largeInput: {
     width: '73%',
+  },
+  imageContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 50,
+    overflow: 'hidden',
+    marginBottom: 24,
   },
 });
