@@ -73,10 +73,6 @@ export default function Profile() {
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.header}>
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>Profile</Text>
-        <IconButton
-          icon={() => <Ionicons name={isEditable ? "checkmark" : "pencil"} size={24} color={theme.colors.onBackground} />}
-          onPress={handleEditModeChange}
-        />
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
@@ -163,15 +159,25 @@ export default function Profile() {
                       theme={{ roundness: 15, colors: { background: 'transparent' } }}
                       editable={isEditable}
                     />
-                    <Button
-                      mode="contained"
-                      onPress={handleLogout}
-                      style={{ backgroundColor: theme.colors.error, marginTop: 16 }}
-                      labelStyle={{ color: theme.colors.onError }}
-                      icon={() => <Ionicons name="exit-outline" size={24} color={theme.colors.onError} />}
-                    >
-                      Logout
-                    </Button>
+                    <View style={styles.buttonRow}>
+                      <Button
+                        mode="outlined"
+                        style={[styles.button, { marginRight: 8 }]}
+                        onPress={handleEditModeChange}
+                        icon={() => <Ionicons name={isEditable ? "checkmark-outline" : "pencil-outline"} size={18} color={theme.colors.primary} />}
+                      >
+                        {isEditable ? "Save" : "Edit"}
+                      </Button>
+                      <Button
+                        mode="contained"
+                        onPress={handleLogout}
+                        style={[styles.button, { backgroundColor: theme.colors.error }]}
+                        labelStyle={{ color: theme.colors.onError }}
+                        icon={() => <Ionicons name="exit-outline" size={18} color={theme.colors.onError} />}
+                      >
+                        Logout
+                      </Button>
+                    </View>
                   </View>
                 </>
               ) : (
@@ -266,5 +272,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     zIndex: 1,
     position: 'absolute',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  button: {
+    flex: 1,
   },
 });
