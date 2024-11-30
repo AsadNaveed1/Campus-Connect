@@ -81,100 +81,101 @@ export default function Profile() {
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <View style={styles.content}>
-            <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
               {user ? (
                 <>
                   <View style={styles.imageContainer}>
                     <EditableImage imageId={auth.currentUser.email} imagePath={'users/profilePictures'} editable={isEditable} />
                   </View>
-                  <TextInput
-                    style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
-                    mode="outlined"
-                    label="Name"
-                    value={name}
-                    onChangeText={setName}
-                    placeholderTextColor={theme.colors.placeholder}
-                    outlineColor={isEditable ? theme.colors.outline : 'transparent'}
-                    theme={{ roundness: 15, colors: { background: 'transparent' } }}
-                    editable={isEditable}
-                    pointerEvents={isEditable ? 'auto' : 'none'}
-                  />
-                  <View style={styles.row}>
+                  <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
                     <TextInput
-                      style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                      style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
                       mode="outlined"
-                      label="Degree"
-                      value={degree}
-                      onChangeText={setDegree}
+                      label="Name"
+                      value={name}
+                      onChangeText={setName}
                       placeholderTextColor={theme.colors.placeholder}
                       outlineColor={isEditable ? theme.colors.outline : 'transparent'}
                       theme={{ roundness: 15, colors: { background: 'transparent' } }}
                       editable={isEditable}
                       pointerEvents={isEditable ? 'auto' : 'none'}
                     />
+                    <View style={styles.row}>
+                      <TextInput
+                        style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                        mode="outlined"
+                        label="Degree"
+                        value={degree}
+                        onChangeText={setDegree}
+                        placeholderTextColor={theme.colors.placeholder}
+                        outlineColor={isEditable ? theme.colors.outline : 'transparent'}
+                        theme={{ roundness: 15, colors: { background: 'transparent' } }}
+                        editable={isEditable}
+                        pointerEvents={isEditable ? 'auto' : 'none'}
+                      />
+                      <TextInput
+                        style={[styles.input, styles.largeInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                        mode="outlined"
+                        label="Major"
+                        value={major}
+                        onChangeText={setMajor}
+                        placeholderTextColor={theme.colors.placeholder}
+                        outlineColor={isEditable ? theme.colors.outline : 'transparent'}
+                        theme={{ roundness: 15, colors: { background: 'transparent' } }}
+                        editable={isEditable}
+                        pointerEvents={isEditable ? 'auto' : 'none'}
+                      />
+                    </View>
+                    <View style={styles.row}>
+                      <TextInput
+                        style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                        mode="outlined"
+                        label="Year"
+                        value={year}
+                        onChangeText={setYear}
+                        placeholderTextColor={theme.colors.placeholder}
+                        outlineColor={isEditable ? theme.colors.outline : 'transparent'}
+                        theme={{ roundness: 15, colors: { background: 'transparent' } }}
+                        editable={isEditable}
+                        pointerEvents={isEditable ? 'auto' : 'none'}
+                      />
+                      <TextInput
+                        style={[styles.input, styles.largeInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                        mode="outlined"
+                        label="University ID"
+                        value={universityID}
+                        onChangeText={setUniversityID}
+                        placeholderTextColor={theme.colors.placeholder}
+                        outlineColor={isEditable ? theme.colors.outline : 'transparent'}
+                        theme={{ roundness: 15, colors: { background: 'transparent' } }}
+                        editable={isEditable}
+                      />
+                    </View>
                     <TextInput
-                      style={[styles.input, styles.largeInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
+                      style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
                       mode="outlined"
-                      label="Major"
-                      value={major}
-                      onChangeText={setMajor}
+                      label="Bio"
+                      value={bio}
+                      onChangeText={setBio}
+                      multiline={true}
+                      numberOfLines={1}
                       placeholderTextColor={theme.colors.placeholder}
                       outlineColor={isEditable ? theme.colors.outline : 'transparent'}
                       theme={{ roundness: 15, colors: { background: 'transparent' } }}
                       editable={isEditable}
-                      pointerEvents={isEditable ? 'auto' : 'none'}
                     />
+                    <Button
+                      mode="contained"
+                      onPress={handleLogout}
+                      style={{ backgroundColor: theme.colors.error, marginTop: 16 }}
+                      labelStyle={{ color: theme.colors.onError }}
+                      icon={() => <Ionicons name="exit-outline" size={24} color={theme.colors.onError} />}
+                    >
+                      Logout
+                    </Button>
                   </View>
-                  <View style={styles.row}>
-                    <TextInput
-                      style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
-                      mode="outlined"
-                      label="Year"
-                      value={year}
-                      onChangeText={setYear}
-                      placeholderTextColor={theme.colors.placeholder}
-                      outlineColor={isEditable ? theme.colors.outline : 'transparent'}
-                      theme={{ roundness: 15, colors: { background: 'transparent' } }}
-                      editable={isEditable}
-                      pointerEvents={isEditable ? 'auto' : 'none'}
-                    />
-                    <TextInput
-                      style={[styles.input, styles.largeInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
-                      mode="outlined"
-                      label="University ID"
-                      value={universityID}
-                      onChangeText={setUniversityID}
-                      placeholderTextColor={theme.colors.placeholder}
-                      outlineColor={isEditable ? theme.colors.outline : 'transparent'}
-                      theme={{ roundness: 15, colors: { background: 'transparent' } }}
-                      editable={isEditable}
-                    />
-                  </View>
-                  <TextInput
-                    style={[styles.input, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
-                    mode="outlined"
-                    label="Bio"
-                    value={bio}
-                    onChangeText={setBio}
-                    multiline={true}
-                    numberOfLines={3}
-                    placeholderTextColor={theme.colors.placeholder}
-                    outlineColor={isEditable ? theme.colors.outline : 'transparent'}
-                    theme={{ roundness: 15, colors: { background: 'transparent' } }}
-                    editable={isEditable}
-                  />
-                  <Button
-                    mode="contained"
-                    onPress={handleLogout}
-                    style={{ backgroundColor: theme.colors.error, marginTop: 16 }}
-                    labelStyle={{ color: theme.colors.onError }}
-                    icon={() => <Ionicons name="exit-outline" size={24} color={theme.colors.onError} />}
-                  >
-                    Logout
-                  </Button>
                 </>
               ) : (
-                <>
+                <View style={styles.signInButton}>
                   <Text variant="bodyMedium" style={[styles.signInPrompt, { color: theme.colors.onBackground }]}>
                     Sign-in to see your profile.
                   </Text>
@@ -185,9 +186,8 @@ export default function Profile() {
                   >
                     Sign-in
                   </Button>
-                </>
+                </ View>
               )}
-            </View>
           </View>
         </View>
       </ScrollView>
@@ -196,6 +196,11 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
+  signInButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   scrollContainer: {
     flexGrow: 1,
     paddingBottom: 80,
@@ -203,7 +208,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-start",
-    alignItems: "flex-start",
+    alignItems: "center",
     padding: 24,
   },
   header: {
@@ -219,7 +224,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     width: '100%',
   },
@@ -236,18 +240,11 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 8,
   },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 16,
-  },
-  universityName: {
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
   card: {
+    marginTop: 110,
     width: '100%',
     padding: 16,
+    paddingTop: 60,
     borderRadius: 15,
     elevation: 5,
   },
@@ -259,10 +256,15 @@ const styles = StyleSheet.create({
     width: '73%',
   },
   imageContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: 50,
+    marginTop: 42,
+    width: 120,
+    height: 120,
+    borderRadius: 100,
     overflow: 'hidden',
-    marginBottom: 24,
+    elevation: 5,
+    borderColor: 'lightgrey',
+    borderWidth: 2,
+    zIndex: 1,
+    position: 'absolute',
   },
 });
