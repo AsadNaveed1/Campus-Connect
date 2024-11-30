@@ -65,22 +65,29 @@ const EventPage = () => {
       setNotificationsEnabled(true);
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "Notifications Enabled",
-          body: "You will receive notifications for this event.",
+          title: eventData.name,
+          body: "This event is starting. Don't forget to attend!",
+        },
+        trigger: new Date(eventData.time.seconds * 1000),
+        identifier: eventId,
+      });
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Reminder on!",
+          body: "You will receive reminders for " + eventData.name + ".",
         },
         trigger: null,
       });
-    } else {
-      console.log('Notification permissions not granted');
     }
   };
 
   const disableNotifications = async () => {
     setNotificationsEnabled(false);
+    await Notifications.cancelScheduledNotificationAsync(eventId);
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Notifications Disabled",
-        body: "You will not receive notifications for this event.",
+        title: "Reminder off",
+        body: "You will no longer receive reminders for " + eventData.name + ".",
       },
       trigger: null,
     });
