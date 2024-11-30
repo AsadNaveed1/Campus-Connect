@@ -73,8 +73,8 @@ const EventPage = () => {
       });
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "Reminder on!",
-          body: "You will receive reminders for " + eventData.name + ".",
+          title: "Reminder set!",
+          body: "You will receive a reminder when " + eventData.name + " starts.",
         },
         trigger: null,
       });
@@ -82,22 +82,32 @@ const EventPage = () => {
   };
 
   const disableNotifications = async () => {
-    setNotificationsEnabled(false);
     await Notifications.cancelScheduledNotificationAsync(eventId);
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Reminder off",
-        body: "You will no longer receive reminders for " + eventData.name + ".",
+        body: "You have left " + eventData.name + ".",
       },
       trigger: null,
     });
+    setNotificationsEnabled(false);
+  };
+
+  const handleJoinButton = async () => {
+    setHasJoined(true);
+    await enableNotifications();
+  };
+
+  const handleLeaveButton = async () => {
+    setHasJoined(false);
+    await disableNotifications();
   };
 
   const handleBackButton = () => {
     router.back();
   };
 
-  if(loading) {
+  if (loading) {
     return (
       <SafeAreaView style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -159,25 +169,15 @@ const EventPage = () => {
         /> */}
       </ScrollView>
       <View style={styles.buttonContainer}>
-      <Button mode="contained" onPress={() => setHasJoined(!hasJoined)} style={styles.joinButton}>
         {hasJoined ? (
-          'Joined'
+          <Button mode="contained" onPress={handleLeaveButton} style={styles.joinButton}>
+            Leave
+          </Button>
         ) : (
-          'Join'
+          <Button mode="contained" onPress={handleJoinButton} style={styles.joinButton}>
+            Join
+          </Button>
         )}
-      </Button>
-        <IconButton
-          icon={() => (
-            <Ionicons
-              name={notificationsEnabled ? "notifications-off" : "notifications"}
-              size={24}
-              color={theme.colors.onBackground}
-            />
-          )}
-          size={24}
-          onPress={notificationsEnabled ? disableNotifications : enableNotifications}
-          style={styles.iconButton}
-        />
       </View>
     </SafeAreaView>
   );
@@ -289,9 +289,6 @@ const styles = StyleSheet.create({
   joinButton: {
     flex: 1,
     marginRight: 8,
-  },
-  iconButton: {
-    marginLeft: 8,
   },
 });
 
