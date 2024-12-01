@@ -63,6 +63,24 @@ export default function TabLayout() {
           tabBarButton: renderTabBarButton,
         }}
       />
+      <Tabs.Screen
+        name="eventAdmin"
+        options={{
+          title: 'Event Admin',
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => renderTabBarIcon('add', focused, color),
+          tabBarButton: renderTabBarButton,
+        }}
+      />
+      <Tabs.Screen
+        name="societyAdmin"
+        options={{
+          title: 'Society Admin',
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => renderTabBarIcon('add', focused, color),
+          tabBarButton: renderTabBarButton,
+        }}
+      />
     </Tabs>
   );
 }
