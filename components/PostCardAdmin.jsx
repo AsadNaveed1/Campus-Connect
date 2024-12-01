@@ -5,7 +5,7 @@ import { Text, useTheme } from 'react-native-paper';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const PostCard = (props) => {
+const PostCardAdmin = (props) => {
   const { id, image, caption, numLikes } = props;
   const theme = useTheme();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
@@ -102,4 +102,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PostCard;
+export default PostCardAdmin;
