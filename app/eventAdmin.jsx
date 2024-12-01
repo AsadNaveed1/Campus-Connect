@@ -46,6 +46,8 @@ const EventAdmin = () => {
           }
         } catch (error) {
         }
+      } else {
+        setIsEditable(true);
       }
       setLoading(false);
     };
@@ -181,7 +183,7 @@ const EventAdmin = () => {
           <EditableImage
             imageUri={eventData.backgroundImage}
             setImageUri={handleImageUpload}
-            editable={isEditable}
+            editable={!!eventId && isEditable}
             imagePath={`events/backgroundImages/${eventId || 'newEvent'}`}
           />
           {!eventId && (

@@ -24,7 +24,7 @@ const SocietyAdmin = () => {
     logo: '',
     backgroundImage: '',
   });
-  const [activeTab, setActiveTab] = useState('Events');
+  const [activeTab, setActiveTab] = useState('About');
   const [menuVisible, setMenuVisible] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
 
@@ -160,6 +160,7 @@ const SocietyAdmin = () => {
         value={societyData.description}
         onChangeText={(text) => setSocietyData({ ...societyData, description: text })}
         multiline
+        numberOfLines={6}
         theme={{ roundness: 15 }}
         editable={isEditable}
       />
@@ -195,14 +196,6 @@ const SocietyAdmin = () => {
           ))}
         </Menu>
       </View>
-      <Button
-        mode="contained"
-        onPress={handleSave}
-        style={styles.saveButton}
-        icon={() => <Ionicons name={isEditable ? "checkmark-outline" : "pencil-outline"} size={18} color={theme.colors.onPrimary} />}
-      >
-        {isEditable ? "Save" : "Edit"}
-      </Button>
     </View>
   );
 
@@ -216,30 +209,30 @@ const SocietyAdmin = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <View style={styles.fixedHeader}>
-        <View style={styles.bannerContainer}>
-          <EditableImage
-            imageUri={societyData.backgroundImage}
-            setImageUri={(uri) => handleImageUpload(uri, 'backgroundImage')}
-            editable={isEditable}
-            imagePath={`societies/${societyId}/backgroundImage`}
-          />
-        </View>
-        <View style={styles.logoWrapper}>
-          <View style={styles.logoContainer}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.fixedHeader}>
+          <View style={styles.bannerContainer}>
             <EditableImage
-              imageUri={societyData.logo}
-              setImageUri={(uri) => handleImageUpload(uri, 'logo')}
+              imageUri={societyData.backgroundImage}
+              setImageUri={(uri) => handleImageUpload(uri, 'backgroundImage')}
               editable={isEditable}
-              imagePath={`societies/${societyId}/logo`}
+              imagePath={`societies/${societyId}/backgroundImage`}
             />
           </View>
+          <View style={styles.logoWrapper}>
+            <View style={styles.logoContainer}>
+              <EditableImage
+                imageUri={societyData.logo}
+                setImageUri={(uri) => handleImageUpload(uri, 'logo')}
+                editable={isEditable}
+                imagePath={`societies/${societyId}/logo`}
+              />
+            </View>
+          </View>
+          <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
+            {societyData.name} Admin Panel
+          </Text>
         </View>
-        <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
-          {societyData.name} Admin Panel
-        </Text>
-      </View>
-      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: theme.colors.background }}>
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tabButton, activeTab === 'About' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
@@ -264,16 +257,28 @@ const SocietyAdmin = () => {
         {activeTab === 'Events' && renderEvents()}
         {activeTab === 'Merch' && renderMerch()}
       </ScrollView>
-      {activeTab === 'Events' && (
-        <Button
-          mode="contained"
-          onPress={handleNewEventButton}
-          style={styles.newEventButton}
-          icon={() => <Ionicons name="add" size={24} color={theme.colors.onPrimary} />}
-        >
-          New Event
-        </Button>
-      )}
+      <View style={styles.buttonContainer}>
+        {activeTab === 'Events' && (
+          <Button
+            mode="contained"
+            onPress={handleNewEventButton}
+            style={styles.newEventButton}
+            icon={() => <Ionicons name="add" size={24} color={theme.colors.onPrimary} />}
+          >
+            New Event
+          </Button>
+        )}
+        {activeTab === 'About' && (
+          <Button
+            mode="contained"
+            onPress={handleSave}
+            style={styles.saveButton}
+            icon={() => <Ionicons name={isEditable ? "checkmark-outline" : "pencil-outline"} size={18} color={theme.colors.onPrimary} />}
+          >
+            {isEditable ? "Save" : "Edit"}
+          </Button>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -283,6 +288,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
   },
   fixedHeader: {
     alignItems: 'center',
@@ -361,13 +369,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   saveButton: {
-    marginTop: 16,
+    flex: 1,
+    marginHorizontal: 8,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
   },
   newEventButton: {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    borderRadius: 30,
+    flex: 1,
+    marginHorizontal: 8,
   },
 });
 
