@@ -61,9 +61,7 @@ const EventAdmin = () => {
       };
       await updateDoc(eventDocRef, updatedEventData);
       ToastAndroid.show('Event updated', ToastAndroid.SHORT);
-      router.push('/events');
     } catch (error) {
-      ToastAndroid.show('Error: ' + error.message, ToastAndroid.SHORT);
     }
   };
 
@@ -72,10 +70,8 @@ const EventAdmin = () => {
       if (eventId) {
         await deleteDoc(doc(firebaseDB, 'events', eventId));
         ToastAndroid.show('Event deleted', ToastAndroid.SHORT);
-        router.push('/events');
       }
     } catch (error) {
-      ToastAndroid.show('Error: ' + error.message, ToastAndroid.SHORT);
     }
   };
 
@@ -227,25 +223,25 @@ const EventAdmin = () => {
         </View>
       </ScrollView>
       <View style={[styles.buttonRow, { backgroundColor: theme.colors.background }]}>
-        <Button
-          mode="contained"
-          onPress={handleSave}
-          style={[styles.button, { marginRight: 8 }]}
-          icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
-        >
-          Save
-        </Button>
         {eventId && (
           <Button
             mode="contained"
             onPress={handleDelete}
-            style={[styles.button, { backgroundColor: theme.colors.error }]}
+            style={[styles.button, { backgroundColor: theme.colors.error, marginRight: 8 }]}
             labelStyle={{ color: theme.colors.onError }}
             icon={() => <Ionicons name="trash-outline" size={18} color={theme.colors.onError} />}
           >
             Delete
           </Button>
         )}
+        <Button
+          mode="contained"
+          onPress={handleSave}
+          style={[styles.button]}
+          icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
+        >
+          Save
+        </Button>
       </View>
     </SafeAreaView>
   );
