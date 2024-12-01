@@ -21,6 +21,7 @@ export default function Profile() {
   const [major, setMajor] = useState("");
   const [year, setYear] = useState("");
   const [universityID, setUniversityID] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
   const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function Profile() {
       setMajor(user.major);
       setYear(user.year);
       setUniversityID(user.universityID);
+      setProfilePicture(user.profilePicture);
     }
   }, [user]);
 
@@ -49,7 +51,7 @@ export default function Profile() {
     try {
       const currentUser = auth.currentUser;
       const userDocRef = doc(firebaseDB, "users", currentUser.email);
-      const updatedUserData = { name, bio, degree, major, year, universityID };
+      const updatedUserData = { name, bio, degree, major, year, universityID, profilePicture };
       await updateDoc(userDocRef, updatedUserData);
       setUser(updatedUserData);
       ToastAndroid.show("Profile updated", ToastAndroid.SHORT);
@@ -80,7 +82,7 @@ export default function Profile() {
               {user ? (
                 <>
                   <View style={styles.imageContainer}>
-                    <EditableImage imageId={auth.currentUser.email} imagePath={'users/profilePictures'} editable={isEditable} />
+                    <EditableImage imageUri={profilePicture} setImageUri={setProfilePicture} editable={isEditable} imagePath={`users/profilePictures/${auth.currentUser.email}`} />
                   </View>
                   <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
                     <TextInput
@@ -248,10 +250,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   card: {
-    marginTop: 110,
+    marginTop: 125,
     width: '100%',
     padding: 16,
-    paddingTop: 60,
+    paddingTop: 55,
     borderRadius: 15,
     elevation: 5,
   },
@@ -263,21 +265,20 @@ const styles = StyleSheet.create({
     width: '73%',
   },
   imageContainer: {
-    marginTop: 42,
-    width: 120,
-    height: 120,
+    marginTop: 36,
+    width: 140,
+    height: 140,
     borderRadius: 100,
     overflow: 'hidden',
-    elevation: 5,
     borderColor: 'lightgrey',
     borderWidth: 2,
     zIndex: 1,
     position: 'absolute',
+    elevation: 5,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
   },
   button: {
     flex: 1,

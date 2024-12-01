@@ -6,23 +6,9 @@ import { useTheme, Dialog, Portal, Button, Text } from "react-native-paper";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { firebaseStorage } from "../firebaseConfig";
 
-const EditableImage = ({ imagePath, imageId, editable }) => {
-  const [imageUri, setImageUri] = useState(null);
+const EditableImage = ({ imageUri, setImageUri, imagePath, editable }) => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const theme = useTheme();
-
-  useEffect(() => {
-    const fetchImage = async () => {
-      try {
-        const storageRef = ref(firebaseStorage, `${imagePath}/${imageId}`);
-        const downloadURL = await getDownloadURL(storageRef);
-        setImageUri(downloadURL);
-      } catch (error) {
-      }
-    };
-
-    fetchImage();
-  }, [imagePath, imageId]);
 
   const handleImagePicker = async () => {
     if (!editable) return;
@@ -70,10 +56,11 @@ const EditableImage = ({ imagePath, imageId, editable }) => {
   const deleteImage = async () => {
     setDialogVisible(false);
     try {
-      const storageRef = ref(firebaseStorage, `${imagePath}/${imageId}`);
+      const storageRef = ref(firebaseStorage, `${imageUri}`);
       await deleteObject(storageRef);
       setImageUri(null);
     } catch (error) {
+      console.error("Error deleting image: ", error);
     }
   };
 
@@ -81,11 +68,12 @@ const EditableImage = ({ imagePath, imageId, editable }) => {
     try {
       const response = await fetch(uri);
       const blob = await response.blob();
-      const storageRef = ref(firebaseStorage, `${imagePath}/${imageId}`);
+      const storageRef = ref(firebaseStorage, `${imagePath}`);
       await uploadBytes(storageRef, blob);
       const downloadURL = await getDownloadURL(storageRef);
       setImageUri(downloadURL);
     } catch (error) {
+      console.error("Error uploading image: ", error);
     }
   };
 
@@ -103,12 +91,12 @@ const EditableImage = ({ imagePath, imageId, editable }) => {
             <View style={styles.imageContainer}>
               <Image source={{ uri: imageUri }} style={styles.image} />
               <View style={styles.iconOverlay}>
-                <Ionicons name="add" size={40} color={'white'} />
+                <Ionicons name="pencil-outline" size={40} color={'white'} />
               </View>
             </View>
           ) : (
             <View style={styles.placeholder}>
-              <Ionicons name="add" size={40} color={theme.colors.outline} />
+              <Ionicons name="add-outline" size={40} color={theme.colors.outline} />
             </View>
           )}
         </Pressable>
@@ -144,6 +132,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: 'lightgrey',
   },
   pressable: {
     flex: 1,
@@ -154,7 +143,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    backgroundColor: "lightgrey",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -190,7 +178,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 16,
   },
 });
 
