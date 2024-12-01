@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useTheme, Text, ActivityIndicator, Button } from 'react-native-paper';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, ToastAndroid } from 'react-native';
+import { useTheme, Text, ActivityIndicator, Button, TextInput, IconButton, Menu, Divider } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { doc, onSnapshot, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
 import EventCard from '../../components/EventCard';
 import MerchCard from '../../components/MerchCard';
@@ -15,10 +15,28 @@ const SocietyAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [merch, setMerch] = useState([]);
-  const [societyData, setSocietyData] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [societyData, setSocietyData] = useState({
+    name: '',
+    description: '',
+    category: '',
+  });
   const [activeTab, setActiveTab] = useState('Events');
+  const [isEditable, setIsEditable] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoryQuery = query(collection(firebaseDB, 'categories'), orderBy('name'));
+        const categoryDocs = await getDocs(categoryQuery);
+        const categoryData = categoryDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setCategories(categoryData);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
     const unsubscribeSociety = onSnapshot(doc(firebaseDB, 'societies', societyId), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
@@ -54,6 +72,7 @@ const SocietyAdmin = () => {
       }
     };
 
+    fetchCategories();
     return () => {
       unsubscribeSociety();
     };
@@ -65,6 +84,17 @@ const SocietyAdmin = () => {
 
   const handleNewEventButton = () => {
     router.push({ pathname: '/eventAdmin', params: { societyId } });
+  };
+
+  const handleSave = async () => {
+    try {
+      const societyDocRef = doc(firebaseDB, 'societies', societyId);
+      await updateDoc(societyDocRef, societyData);
+      ToastAndroid.show('Society updated', ToastAndroid.SHORT);
+      setIsEditable(false);
+    } catch (error) {
+      console.error('Error updating society data:', error);
+    }
   };
 
   const renderEvents = () => (
@@ -102,9 +132,64 @@ const SocietyAdmin = () => {
 
   const renderAbout = () => (
     <View style={styles.aboutContainer}>
-      <Text style={[styles.aboutText, { color: theme.colors.onBackground }]}>
-        {societyData.description}
-      </Text>
+      <TextInput
+        style={[styles.input, { backgroundColor: theme.colors.surface }]}
+        mode="outlined"
+        label="Society Name"
+        value={societyData.name}
+        onChangeText={(text) => setSocietyData({ ...societyData, name: text })}
+        theme={{ roundness: 15 }}
+        editable={isEditable}
+      />
+      <TextInput
+        style={[styles.input, { backgroundColor: theme.colors.surface }]}
+        mode="outlined"
+        label="Description"
+        value={societyData.description}
+        onChangeText={(text) => setSocietyData({ ...societyData, description: text })}
+        multiline
+        theme={{ roundness: 15 }}
+        editable={isEditable}
+      />
+      <View style={styles.categoryContainer}>
+        <Text style={styles.categoryLabel}>Category:</Text>
+        <Menu
+          visible={menuVisible}
+          onDismiss={() => setMenuVisible(false)}
+          anchor={
+            <Button
+              mode="text"
+              onPress={() => setMenuVisible(true)}
+              disabled={!isEditable}
+              style={styles.categoryButton}
+              contentStyle={{ flexDirection: 'row-reverse' }}
+              icon={isEditable ? () => <Ionicons name="chevron-down" size={16} color={theme.colors.primary} /> : null}>
+              {categories.find(category => category.id === societyData.category)?.name || 'Select Category'}
+            </Button>
+          }
+        >
+          {categories.map(category => (
+            <Menu.Item
+              key={category.id}
+              onPress={() => {
+                setSocietyData({ ...societyData, category: category.id });
+                setMenuVisible(false);
+              }}
+              title={category.name}
+            />
+          ))}
+        </Menu>
+      </View>
+      {isEditable && (
+        <Button
+          mode="contained"
+          onPress={handleSave}
+          style={styles.saveButton}
+          icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
+        >
+          Save
+        </Button>
+      )}
     </View>
   );
 
@@ -123,6 +208,10 @@ const SocietyAdmin = () => {
           <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
             {societyData.name} Admin Panel
           </Text>
+          <IconButton
+            icon={() => <Ionicons name={isEditable ? "checkmark-outline" : "pencil-outline"} size={24} color={theme.colors.primary} />}
+            onPress={() => setIsEditable(!isEditable)}
+          />
         </View>
         <View style={styles.tabContainer}>
           <TouchableOpacity
@@ -176,6 +265,7 @@ const styles = StyleSheet.create({
   title: {
     marginLeft: 16,
     fontWeight: 'bold',
+    flex: 1,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -207,8 +297,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 16,
   },
-  aboutText: {
+  input: {
+    width: '100%',
+    marginBottom: 8,
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  categoryLabel: {
+    marginRight: 8,
     fontSize: 16,
+  },
+  categoryButton: {
+    flex: 1,
+  },
+  saveButton: {
+    marginTop: 16,
   },
   newEventButton: {
     position: 'absolute',
