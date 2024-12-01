@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 const EventCard = (props) => {
-  const { eventId, date, title, subtitle, location, imageUrl, circleImageUrl, minimal } = props;
+  const { eventId, date, title, subtitle, location, imageUrl, circleImageUrl, minimal, admin, societyId} = props;
   const theme = useTheme();
   const router = useRouter();
   const scale = new Animated.Value(1);
@@ -25,7 +25,11 @@ const EventCard = (props) => {
   };
 
   const handlePress = () => {
-    router.push({ pathname: "/eventPage", params: { eventId } });
+    if (admin) {
+      router.push({ pathname: "/eventAdmin", params: { eventId, societyId } });
+    } else {
+      router.push({ pathname: "/eventPage", params: { eventId } });
+    }
   };
 
   return (
