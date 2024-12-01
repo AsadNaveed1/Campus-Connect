@@ -164,6 +164,7 @@ const EventAdmin = () => {
               label="Event Name"
               value={eventData.name}
               onChangeText={(text) => setEventData({ ...eventData, name: text })}
+              theme={{ roundness: 15 }}
             />
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
@@ -172,6 +173,7 @@ const EventAdmin = () => {
               value={eventData.description}
               onChangeText={(text) => setEventData({ ...eventData, description: text })}
               multiline
+              theme={{ roundness: 15 }}
             />
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
@@ -180,10 +182,16 @@ const EventAdmin = () => {
               value={eventData.fee.toString()}
               onChangeText={(text) => setEventData({ ...eventData, fee: parseFloat(text) })}
               keyboardType="numeric"
+              theme={{ roundness: 15 }}
             />
-            <Button onPress={() => setDatePickerOpen(true)} uppercase={false} mode="outlined" style={styles.input}>
-              Pick Event Date
-            </Button>
+            <View style={styles.row}>
+              <Button onPress={() => setDatePickerOpen(true)} uppercase={false} mode="outlined" style={[styles.input, styles.halfInput]}>
+                Date
+              </Button>
+              <Button onPress={() => setTimePickerOpen(true)} uppercase={false} mode="outlined" style={[styles.input, styles.halfInput]}>
+                Time
+              </Button>
+            </View>
             <DatePickerModal
               locale="en"
               mode="single"
@@ -192,9 +200,6 @@ const EventAdmin = () => {
               date={isValidDate ? eventDate : new Date()}
               onConfirm={onConfirmSingle}
             />
-            <Button onPress={() => setTimePickerOpen(true)} uppercase={false} mode="outlined" style={styles.input}>
-              Pick Event Time
-            </Button>
             <TimePickerModal
               visible={timePickerOpen}
               onDismiss={onDismissTime}
@@ -208,6 +213,7 @@ const EventAdmin = () => {
               label="Location"
               value={eventData.location}
               onChangeText={(text) => setEventData({ ...eventData, location: text })}
+              theme={{ roundness: 15 }}
             />
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
@@ -215,6 +221,7 @@ const EventAdmin = () => {
               label="Society"
               value={eventData.society}
               onChangeText={(text) => setEventData({ ...eventData, society: text })}
+              theme={{ roundness: 15 }}
             />
           </View>
         </View>
@@ -274,6 +281,14 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     marginBottom: 8,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  halfInput: {
+    width: '48%',
   },
   buttonRow: {
     flexDirection: 'row',
