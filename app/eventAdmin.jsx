@@ -3,14 +3,15 @@ import { View, StyleSheet, ScrollView, ToastAndroid, Dimensions } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Text, TextInput, ActivityIndicator, useTheme, IconButton } from 'react-native-paper';
 import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, getDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
-import { firebaseDB } from '../../firebaseConfig';
-import EditableImage from '../../components/EditableImage';
+import { doc, getDoc, updateDoc, deleteDoc, addDoc, collection, Timestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { getStorage, ref, deleteObject } from 'firebase/storage';
+import { firebaseDB } from '../firebaseConfig';
+import EditableImage from '../components/EditableImage';
 
 const EventAdmin = () => {
-  const eventId = 'RaOugCIWbxNicp7gaJMK';
+  const { eventId, societyId } = useLocalSearchParams();
   const theme = useTheme();
   const router = useRouter();
   const [eventData, setEventData] = useState({
@@ -20,7 +21,7 @@ const EventAdmin = () => {
     time: '',
     location: '',
     backgroundImage: '',
-    society: '',
+    society: societyId || '',
   });
   const [loading, setLoading] = useState(true);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -43,7 +44,6 @@ const EventAdmin = () => {
             }
           }
         } catch (error) {
-          console.error('Error fetching event data:', error);
         }
       }
       setLoading(false);
@@ -65,11 +65,41 @@ const EventAdmin = () => {
     }
   };
 
+  const handleCreate = async () => {
+    try {
+      const newEventData = {
+        ...eventData,
+        time: Timestamp.fromDate(new Date(selectedDate.setHours(selectedTime.hours, selectedTime.minutes))),
+      };
+      const eventDocRef = await addDoc(collection(firebaseDB, 'events'), newEventData);
+      await updateDoc(doc(firebaseDB, 'societies', societyId), {
+        events: arrayUnion(eventDocRef.id),
+      });
+      ToastAndroid.show('Event created', ToastAndroid.SHORT);
+      router.back();
+    } catch (error) {
+    }
+  };
+
   const handleDelete = async () => {
     try {
       if (eventId) {
-        await deleteDoc(doc(firebaseDB, 'events', eventId));
+        const eventDocRef = doc(firebaseDB, 'events', eventId);
+        const eventDoc = await getDoc(eventDocRef);
+        if (eventDoc.exists()) {
+          const eventData = eventDoc.data();
+          if (eventData.backgroundImage) {
+            const storage = getStorage();
+            const imageRef = ref(storage, eventData.backgroundImage);
+            await deleteObject(imageRef);
+          }
+        }
+        await deleteDoc(eventDocRef);
+        await updateDoc(doc(firebaseDB, 'societies', societyId), {
+          events: arrayRemove(eventId),
+        });
         ToastAndroid.show('Event deleted', ToastAndroid.SHORT);
+        router.back();
       }
     } catch (error) {
     }
@@ -81,7 +111,6 @@ const EventAdmin = () => {
       await updateDoc(eventDocRef, { backgroundImage: uri });
       setEventData((prevData) => ({ ...prevData, backgroundImage: uri }));
     } catch (error) {
-      console.error('Error updating image URL in Firestore:', error);
     }
   };
 
@@ -148,9 +177,14 @@ const EventAdmin = () => {
           <EditableImage
             imageUri={eventData.backgroundImage}
             setImageUri={handleImageUpload}
-            editable={true}
-            imagePath={`events/backgroundImages/${eventId}`}
+            editable={!!eventId}
+            imagePath={`events/backgroundImages/${eventId || 'newEvent'}`}
           />
+          {!eventId && (
+            <View style={styles.overlay}>
+              <Text style={styles.overlayText}>Image can be added after event creation.</Text>
+            </View>
+          )}
         </View>
         <View style={styles.container}>
           <View style={[styles.card, { backgroundColor: theme.colors.surface }]}>
@@ -211,37 +245,40 @@ const EventAdmin = () => {
               onChangeText={(text) => setEventData({ ...eventData, location: text })}
               theme={{ roundness: 15 }}
             />
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface }]}
-              mode="outlined"
-              label="Society"
-              value={eventData.society}
-              onChangeText={(text) => setEventData({ ...eventData, society: text })}
-              theme={{ roundness: 15 }}
-            />
           </View>
         </View>
       </ScrollView>
       <View style={[styles.buttonRow, { backgroundColor: theme.colors.background }]}>
-        {eventId && (
+        {eventId ? (
+          <>
+            <Button
+              mode="contained"
+              onPress={handleDelete}
+              style={[styles.button, { backgroundColor: theme.colors.error, marginRight: 8 }]}
+              labelStyle={{ color: theme.colors.onError }}
+              icon={() => <Ionicons name="trash-outline" size={18} color={theme.colors.onError} />}
+            >
+              Delete
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleSave}
+              style={[styles.button]}
+              icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
+            >
+              Save
+            </Button>
+          </>
+        ) : (
           <Button
             mode="contained"
-            onPress={handleDelete}
-            style={[styles.button, { backgroundColor: theme.colors.error, marginRight: 8 }]}
-            labelStyle={{ color: theme.colors.onError }}
-            icon={() => <Ionicons name="trash-outline" size={18} color={theme.colors.onError} />}
+            onPress={handleCreate}
+            style={[styles.button]}
+            icon={() => <Ionicons name="add-outline" size={18} color={theme.colors.onPrimary} />}
           >
-            Delete
+            Create
           </Button>
         )}
-        <Button
-          mode="contained"
-          onPress={handleSave}
-          style={[styles.button]}
-          icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
-        >
-          Save
-        </Button>
       </View>
     </SafeAreaView>
   );
@@ -303,6 +340,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 20,
     zIndex: 1,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlayText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
