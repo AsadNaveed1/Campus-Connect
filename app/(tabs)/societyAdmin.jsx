@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, ToastAndroid } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, ToastAndroid, Image, ImageBackground } from 'react-native';
 import { useTheme, Text, ActivityIndicator, Button, TextInput, IconButton, Menu, Divider } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -20,9 +20,10 @@ const SocietyAdmin = () => {
     name: '',
     description: '',
     category: '',
+    logo: '',
+    backgroundImage: '',
   });
   const [activeTab, setActiveTab] = useState('Events');
-  const [isEditable, setIsEditable] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
@@ -78,10 +79,6 @@ const SocietyAdmin = () => {
     };
   }, [societyId]);
 
-  const handleBackButton = () => {
-    router.back();
-  };
-
   const handleNewEventButton = () => {
     router.push({ pathname: '/eventAdmin', params: { societyId } });
   };
@@ -91,9 +88,19 @@ const SocietyAdmin = () => {
       const societyDocRef = doc(firebaseDB, 'societies', societyId);
       await updateDoc(societyDocRef, societyData);
       ToastAndroid.show('Society updated', ToastAndroid.SHORT);
-      setIsEditable(false);
     } catch (error) {
       console.error('Error updating society data:', error);
+    }
+  };
+
+  const handleImageUpload = async (uri, type) => {
+    try {
+      const updatedData = { ...societyData, [type]: uri };
+      setSocietyData(updatedData);
+      const societyDocRef = doc(firebaseDB, 'societies', societyId);
+      await updateDoc(societyDocRef, updatedData);
+    } catch (error) {
+      console.error('Error uploading image:', error);
     }
   };
 
@@ -139,7 +146,6 @@ const SocietyAdmin = () => {
         value={societyData.name}
         onChangeText={(text) => setSocietyData({ ...societyData, name: text })}
         theme={{ roundness: 15 }}
-        editable={isEditable}
       />
       <TextInput
         style={[styles.input, { backgroundColor: theme.colors.surface }]}
@@ -149,7 +155,6 @@ const SocietyAdmin = () => {
         onChangeText={(text) => setSocietyData({ ...societyData, description: text })}
         multiline
         theme={{ roundness: 15 }}
-        editable={isEditable}
       />
       <View style={styles.categoryContainer}>
         <Text style={styles.categoryLabel}>Category:</Text>
@@ -160,10 +165,9 @@ const SocietyAdmin = () => {
             <Button
               mode="text"
               onPress={() => setMenuVisible(true)}
-              disabled={!isEditable}
               style={styles.categoryButton}
               contentStyle={{ flexDirection: 'row-reverse' }}
-              icon={isEditable ? () => <Ionicons name="chevron-down" size={16} color={theme.colors.primary} /> : null}>
+              icon={() => <Ionicons name="chevron-down" size={16} color={theme.colors.primary} />}>
               {categories.find(category => category.id === societyData.category)?.name || 'Select Category'}
             </Button>
           }
@@ -180,16 +184,14 @@ const SocietyAdmin = () => {
           ))}
         </Menu>
       </View>
-      {isEditable && (
-        <Button
-          mode="contained"
-          onPress={handleSave}
-          style={styles.saveButton}
-          icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
-        >
-          Save
-        </Button>
-      )}
+      <Button
+        mode="contained"
+        onPress={handleSave}
+        style={styles.saveButton}
+        icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
+      >
+        Save
+      </Button>
     </View>
   );
 
@@ -203,16 +205,27 @@ const SocietyAdmin = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <View style={styles.fixedHeader}>
+        <ImageBackground
+          source={{ uri: societyData.backgroundImage }}
+          style={styles.societyInfo}
+          resizeMode="cover"
+        >
+          <View style={styles.logoContainer}>
+            <Image
+              source={{ uri: societyData.logo }}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
+        </ImageBackground>
+      </View>
+      <View style={styles.detailsContainer}>
+        <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
+          {societyData.name} Admin Panel
+        </Text>
+      </View>
       <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: theme.colors.background }}>
-        <View style={styles.header}>
-          <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
-            {societyData.name} Admin Panel
-          </Text>
-          <IconButton
-            icon={() => <Ionicons name={isEditable ? "checkmark-outline" : "pencil-outline"} size={24} color={theme.colors.primary} />}
-            onPress={() => setIsEditable(!isEditable)}
-          />
-        </View>
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tabButton, activeTab === 'About' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
@@ -257,15 +270,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  header: {
+  fixedHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    zIndex: 1,
+  },
+  societyInfo: {
+    height: 160,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    width: 90,
+    height: 90,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    borderColor: 'lightgrey',
+    borderWidth: 1,
+    elevation: 5,
+    bottom: -20,
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+    zIndex: 1,
+    overflow: 'hidden',
+  },
+  logo: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 40,
+  },
+  detailsContainer: {
+    marginVertical: 20,
+    marginHorizontal: 16,
   },
   title: {
-    marginLeft: 16,
+    marginTop: 8,
+    fontSize: 24,
     fontWeight: 'bold',
-    flex: 1,
+    textAlign: 'center',
   },
   tabContainer: {
     flexDirection: 'row',
