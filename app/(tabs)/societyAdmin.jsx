@@ -26,6 +26,7 @@ const SocietyAdmin = () => {
   });
   const [activeTab, setActiveTab] = useState('Events');
   const [menuVisible, setMenuVisible] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -85,13 +86,16 @@ const SocietyAdmin = () => {
   };
 
   const handleSave = async () => {
-    try {
-      const societyDocRef = doc(firebaseDB, 'societies', societyId);
-      await updateDoc(societyDocRef, societyData);
-      ToastAndroid.show('Society updated', ToastAndroid.SHORT);
-    } catch (error) {
-      console.error('Error updating society data:', error);
+    if (isEditable) {
+      try {
+        const societyDocRef = doc(firebaseDB, 'societies', societyId);
+        await updateDoc(societyDocRef, societyData);
+        ToastAndroid.show('Society updated', ToastAndroid.SHORT);
+      } catch (error) {
+        console.error('Error updating society data:', error);
+      }
     }
+    setIsEditable(!isEditable);
   };
 
   const handleImageUpload = async (uri, type) => {
@@ -141,21 +145,23 @@ const SocietyAdmin = () => {
   const renderAbout = () => (
     <View style={styles.aboutContainer}>
       <TextInput
-        style={[styles.input, { backgroundColor: theme.colors.surface }]}
+        style={[styles.input]}
         mode="outlined"
         label="Society Name"
         value={societyData.name}
         onChangeText={(text) => setSocietyData({ ...societyData, name: text })}
         theme={{ roundness: 15 }}
+        editable={isEditable}
       />
       <TextInput
-        style={[styles.input, { backgroundColor: theme.colors.surface }]}
+        style={[styles.input]}
         mode="outlined"
         label="Description"
         value={societyData.description}
         onChangeText={(text) => setSocietyData({ ...societyData, description: text })}
         multiline
         theme={{ roundness: 15 }}
+        editable={isEditable}
       />
       <View style={styles.categoryContainer}>
         <Text style={styles.categoryLabel}>Category:</Text>
@@ -166,6 +172,7 @@ const SocietyAdmin = () => {
             <TouchableOpacity
               onPress={() => setMenuVisible(true)}
               style={styles.categoryButton}
+              disabled={!isEditable}
             >
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
                 <Ionicons name="chevron-down" size={16} color={theme.colors.primary} />
@@ -192,9 +199,9 @@ const SocietyAdmin = () => {
         mode="contained"
         onPress={handleSave}
         style={styles.saveButton}
-        icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
+        icon={() => <Ionicons name={isEditable ? "checkmark-outline" : "pencil-outline"} size={18} color={theme.colors.onPrimary} />}
       >
-        Save
+        {isEditable ? "Save" : "Edit"}
       </Button>
     </View>
   );
@@ -214,7 +221,7 @@ const SocietyAdmin = () => {
           <EditableImage
             imageUri={societyData.backgroundImage}
             setImageUri={(uri) => handleImageUpload(uri, 'backgroundImage')}
-            editable={true}
+            editable={isEditable}
             imagePath={`societies/${societyId}/backgroundImage`}
           />
         </View>
@@ -223,7 +230,7 @@ const SocietyAdmin = () => {
             <EditableImage
               imageUri={societyData.logo}
               setImageUri={(uri) => handleImageUpload(uri, 'logo')}
-              editable={true}
+              editable={isEditable}
               imagePath={`societies/${societyId}/logo`}
             />
           </View>

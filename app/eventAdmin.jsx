@@ -28,6 +28,7 @@ const EventAdmin = () => {
   const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState({ hours: 0, minutes: 0 });
+  const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -53,16 +54,19 @@ const EventAdmin = () => {
   }, [eventId]);
 
   const handleSave = async () => {
-    try {
-      const eventDocRef = doc(firebaseDB, 'events', eventId);
-      const updatedEventData = {
-        ...eventData,
-        time: Timestamp.fromDate(new Date(selectedDate.setHours(selectedTime.hours, selectedTime.minutes))),
-      };
-      await updateDoc(eventDocRef, updatedEventData);
-      ToastAndroid.show('Event updated', ToastAndroid.SHORT);
-    } catch (error) {
+    if (isEditable) {
+      try {
+        const eventDocRef = doc(firebaseDB, 'events', eventId);
+        const updatedEventData = {
+          ...eventData,
+          time: Timestamp.fromDate(new Date(selectedDate.setHours(selectedTime.hours, selectedTime.minutes))),
+        };
+        await updateDoc(eventDocRef, updatedEventData);
+        ToastAndroid.show('Event updated', ToastAndroid.SHORT);
+      } catch (error) {
+      }
     }
+    setIsEditable(!isEditable);
   };
 
   const handleCreate = async () => {
@@ -177,7 +181,7 @@ const EventAdmin = () => {
           <EditableImage
             imageUri={eventData.backgroundImage}
             setImageUri={handleImageUpload}
-            editable={!!eventId}
+            editable={isEditable}
             imagePath={`events/backgroundImages/${eventId || 'newEvent'}`}
           />
           {!eventId && (
@@ -195,6 +199,7 @@ const EventAdmin = () => {
               value={eventData.name}
               onChangeText={(text) => setEventData({ ...eventData, name: text })}
               theme={{ roundness: 15 }}
+              editable={isEditable}
             />
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
@@ -204,6 +209,7 @@ const EventAdmin = () => {
               onChangeText={(text) => setEventData({ ...eventData, description: text })}
               multiline
               theme={{ roundness: 15 }}
+              editable={isEditable}
             />
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
@@ -213,12 +219,13 @@ const EventAdmin = () => {
               onChangeText={(text) => setEventData({ ...eventData, fee: parseFloat(text) })}
               keyboardType="numeric"
               theme={{ roundness: 15 }}
+              editable={isEditable}
             />
             <View style={styles.row}>
-              <Button onPress={() => setDatePickerOpen(true)} uppercase={false} mode="outlined" style={[styles.input, styles.halfInput]}>
+              <Button onPress={() => setDatePickerOpen(true)} uppercase={false} mode="outlined" style={[styles.input, styles.halfInput]} disabled={!isEditable}>
                 Date
               </Button>
-              <Button onPress={() => setTimePickerOpen(true)} uppercase={false} mode="outlined" style={[styles.input, styles.halfInput]}>
+              <Button onPress={() => setTimePickerOpen(true)} uppercase={false} mode="outlined" style={[styles.input, styles.halfInput]} disabled={!isEditable}>
                 Time
               </Button>
             </View>
@@ -244,6 +251,7 @@ const EventAdmin = () => {
               value={eventData.location}
               onChangeText={(text) => setEventData({ ...eventData, location: text })}
               theme={{ roundness: 15 }}
+              editable={isEditable}
             />
           </View>
         </View>
@@ -264,9 +272,9 @@ const EventAdmin = () => {
               mode="contained"
               onPress={handleSave}
               style={[styles.button]}
-              icon={() => <Ionicons name="save-outline" size={18} color={theme.colors.onPrimary} />}
+              icon={() => <Ionicons name={isEditable ? "checkmark-outline" : "pencil-outline"} size={18} color={theme.colors.onPrimary} />}
             >
-              Save
+              {isEditable ? "Save" : "Edit"}
             </Button>
           </>
         ) : (
