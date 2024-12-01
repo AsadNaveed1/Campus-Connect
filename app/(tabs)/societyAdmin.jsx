@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, ToastAndroid, Image, ImageBackground } from 'react-native';
-import { useTheme, Text, ActivityIndicator, Button, TextInput, IconButton, Menu, Divider } from 'react-native-paper';
+import { View, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, ToastAndroid } from 'react-native';
+import { useTheme, Text, ActivityIndicator, Button, TextInput, Menu } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { doc, onSnapshot, getDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
 import EventCard from '../../components/EventCard';
 import MerchCard from '../../components/MerchCard';
+import EditableImage from '../../components/EditableImage';
 
 const SocietyAdmin = () => {
   const theme = useTheme();
@@ -162,14 +163,17 @@ const SocietyAdmin = () => {
           visible={menuVisible}
           onDismiss={() => setMenuVisible(false)}
           anchor={
-            <Button
-              mode="text"
+            <TouchableOpacity
               onPress={() => setMenuVisible(true)}
               style={styles.categoryButton}
-              contentStyle={{ flexDirection: 'row-reverse' }}
-              icon={() => <Ionicons name="chevron-down" size={16} color={theme.colors.primary} />}>
-              {categories.find(category => category.id === societyData.category)?.name || 'Select Category'}
-            </Button>
+            >
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
+                <Ionicons name="chevron-down" size={16} color={theme.colors.primary} />
+                <Text style={{ color: theme.colors.primary, fontSize: 16 }}>
+                  {categories.find(category => category.id === societyData.category)?.name || 'Select Category'}
+                </Text>
+              </View>
+            </TouchableOpacity>
           }
         >
           {categories.map(category => (
@@ -206,21 +210,24 @@ const SocietyAdmin = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.fixedHeader}>
-        <ImageBackground
-          source={{ uri: societyData.backgroundImage }}
-          style={styles.societyInfo}
-          resizeMode="cover"
-        >
+        <View style={styles.bannerContainer}>
+          <EditableImage
+            imageUri={societyData.backgroundImage}
+            setImageUri={(uri) => handleImageUpload(uri, 'backgroundImage')}
+            editable={true}
+            imagePath={`societies/${societyId}/backgroundImage`}
+          />
+        </View>
+        <View style={styles.logoWrapper}>
           <View style={styles.logoContainer}>
-            <Image
-              source={{ uri: societyData.logo }}
-              style={styles.logo}
-              resizeMode="contain"
+            <EditableImage
+              imageUri={societyData.logo}
+              setImageUri={(uri) => handleImageUpload(uri, 'logo')}
+              editable={true}
+              imagePath={`societies/${societyId}/logo`}
             />
           </View>
-        </ImageBackground>
-      </View>
-      <View style={styles.detailsContainer}>
+        </View>
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
           {societyData.name} Admin Panel
         </Text>
@@ -271,42 +278,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fixedHeader: {
-    flexDirection: 'row',
     alignItems: 'center',
-    zIndex: 1,
   },
-  societyInfo: {
-    height: 160,
+  bannerContainer: {
     width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 160,
+  },
+  logoWrapper: {
+    position: 'absolute',
+    top: 120,
+    zIndex: 1,
+    alignSelf: 'center',
   },
   logoContainer: {
     width: 90,
     height: 90,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
+    borderRadius: 45,
     borderColor: 'lightgrey',
     borderWidth: 1,
     elevation: 5,
-    bottom: -20,
     backgroundColor: 'rgba(255, 255, 255, 1)',
-    zIndex: 1,
     overflow: 'hidden',
   },
-  logo: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 40,
-  },
-  detailsContainer: {
-    marginVertical: 20,
-    marginHorizontal: 16,
-  },
   title: {
-    marginTop: 8,
+    marginTop: 72,
+    marginBottom: 16,
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -348,7 +344,7 @@ const styles = StyleSheet.create({
   categoryContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginVertical: 8,
   },
   categoryLabel: {
     marginRight: 8,
