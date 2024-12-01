@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, ToastAndroid, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Text, TextInput, ActivityIndicator, useTheme, IconButton } from 'react-native-paper';
+import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
 import EditableImage from '../../components/EditableImage';
 
@@ -22,6 +23,10 @@ const EventAdmin = () => {
     society: '',
   });
   const [loading, setLoading] = useState(true);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [timePickerOpen, setTimePickerOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState({ hours: 0, minutes: 0 });
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -29,7 +34,13 @@ const EventAdmin = () => {
         try {
           const eventDoc = await getDoc(doc(firebaseDB, 'events', eventId));
           if (eventDoc.exists()) {
-            setEventData(eventDoc.data());
+            const data = eventDoc.data();
+            setEventData(data);
+            if (data.time) {
+              const eventDate = data.time.toDate();
+              setSelectedDate(eventDate);
+              setSelectedTime({ hours: eventDate.getHours(), minutes: eventDate.getMinutes() });
+            }
           }
         } catch (error) {
           console.error('Error fetching event data:', error);
@@ -44,7 +55,11 @@ const EventAdmin = () => {
   const handleSave = async () => {
     try {
       const eventDocRef = doc(firebaseDB, 'events', eventId);
-      await updateDoc(eventDocRef, eventData);
+      const updatedEventData = {
+        ...eventData,
+        time: Timestamp.fromDate(new Date(selectedDate.setHours(selectedTime.hours, selectedTime.minutes))),
+      };
+      await updateDoc(eventDocRef, updatedEventData);
       ToastAndroid.show('Event updated', ToastAndroid.SHORT);
       router.push('/events');
     } catch (error) {
@@ -78,6 +93,38 @@ const EventAdmin = () => {
     router.back();
   };
 
+  const onDismissSingle = useCallback(() => {
+    setDatePickerOpen(false);
+  }, [setDatePickerOpen]);
+
+  const onConfirmSingle = useCallback(
+    (params) => {
+      setDatePickerOpen(false);
+      setSelectedDate(params.date);
+      const updatedDate = new Date(params.date);
+      updatedDate.setHours(selectedTime.hours);
+      updatedDate.setMinutes(selectedTime.minutes);
+      setEventData((prevData) => ({ ...prevData, time: updatedDate.toISOString() }));
+    },
+    [selectedTime]
+  );
+
+  const onDismissTime = useCallback(() => {
+    setTimePickerOpen(false);
+  }, [setTimePickerOpen]);
+
+  const onConfirmTime = useCallback(
+    ({ hours, minutes }) => {
+      setTimePickerOpen(false);
+      setSelectedTime({ hours, minutes });
+      const updatedDate = new Date(selectedDate);
+      updatedDate.setHours(hours);
+      updatedDate.setMinutes(minutes);
+      setEventData((prevData) => ({ ...prevData, time: updatedDate.toISOString() }));
+    },
+    [selectedDate]
+  );
+
   if (loading) {
     return (
       <SafeAreaView style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
@@ -89,15 +136,18 @@ const EventAdmin = () => {
   const screenHeight = Dimensions.get('window').height;
   const bannerHeight = screenHeight * 0.4;
 
+  const eventDate = new Date(eventData.time);
+  const isValidDate = !isNaN(eventDate.getTime());
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <IconButton
-        icon={() => <Ionicons name="chevron-back" size={24} color="#fff" />}
-        size={24}
-        onPress={handleBackButton}
-        style={styles.backButton}
-      />
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <IconButton
+          icon={() => <Ionicons name="chevron-back" size={24} color="#fff" />}
+          size={24}
+          onPress={handleBackButton}
+          style={styles.backButton}
+        />
         <View style={[styles.bannerContainer, { height: bannerHeight }]}>
           <EditableImage
             imageUri={eventData.backgroundImage}
@@ -131,12 +181,26 @@ const EventAdmin = () => {
               onChangeText={(text) => setEventData({ ...eventData, fee: parseFloat(text) })}
               keyboardType="numeric"
             />
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface }]}
-              mode="outlined"
-              label="Time"
-              value={eventData.time}
-              onChangeText={(text) => setEventData({ ...eventData, time: text })}
+            <Button onPress={() => setDatePickerOpen(true)} uppercase={false} mode="outlined" style={styles.input}>
+              Pick Event Date
+            </Button>
+            <DatePickerModal
+              locale="en"
+              mode="single"
+              visible={datePickerOpen}
+              onDismiss={onDismissSingle}
+              date={isValidDate ? eventDate : new Date()}
+              onConfirm={onConfirmSingle}
+            />
+            <Button onPress={() => setTimePickerOpen(true)} uppercase={false} mode="outlined" style={styles.input}>
+              Pick Event Time
+            </Button>
+            <TimePickerModal
+              visible={timePickerOpen}
+              onDismiss={onDismissTime}
+              onConfirm={onConfirmTime}
+              hours={selectedTime.hours}
+              minutes={selectedTime.minutes}
             />
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
