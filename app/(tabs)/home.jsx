@@ -61,53 +61,56 @@ export default function Home() {
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
           Home
         </Text>
-        <IconButton
+        {user ? (<IconButton
           icon="reload"
           size={24}
           onPress={handleReload}
           style={{ marginRight: 0, marginTop: 8 }}
-        />
+        /> ) : null}
       </View>
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
-          Recent Posts
-        </Text>
-        {posts.length > 0 ? (
-          <>
-            {posts.map(post => {
-              const currentDate = new Date();
-              const postDate = new Date(post.date.seconds * 1000);
-              const isSameDate = currentDate.toDateString() === postDate.toDateString();
-
-              const formattedDate = isSameDate
-                ? postDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })
-                : postDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-              return (
-                <PostCard
-                  key={post.id}
-                  postId={post.id}
-                  image={post.image}
-                  caption={post.caption}
-                  date={formattedDate}
-                  societyName={post.societyName}
-                />
-              );
-            })}
-            <View style={styles.bottomSpacer}></View>
-          </>
-        ) : (
-          <View style={styles.centeredContainer}>
-            <Text style={{ color: theme.colors.onBackground, textAlign: 'center' }}>
-              Join some societies to see their posts here.
+      {user ? (
+        <>
+          <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+              Recent Posts
             </Text>
-          </View>
-        )}
-      </ScrollView>
+            {posts.length > 0 ? (
+              <>
+                {posts.map(post => {
+                  const currentDate = new Date();
+                  const postDate = new Date(post.date.seconds * 1000);
+                  const isSameDate = currentDate.toDateString() === postDate.toDateString();
 
-      <SearchButton />
-      <MagicShake />
+                  const formattedDate = isSameDate
+                    ? postDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })
+                    : postDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+                  return (
+                    <PostCard
+                      key={post.id}
+                      postId={post.id}
+                      image={post.image}
+                      caption={post.caption}
+                      date={formattedDate}
+                      societyName={post.societyName}
+                    />
+                  );
+                })}
+                <View style={styles.bottomSpacer}></View>
+              </>
+            ) : (
+              <View style={styles.centeredContainer}>
+                <Text style={{ color: theme.colors.onBackground, textAlign: 'center' }}>
+                  Join some societies to see their posts here.
+                </Text>
+              </View>
+            )}
+          </ScrollView> 
+          <SearchButton />
+          <MagicShake />
+        </>
+      ) : null }
     </SafeAreaView>
   );
 }

@@ -23,6 +23,8 @@ export default function Societies() {
   const scrollViewRef = useRef(null);
 
   useEffect(() => {
+    if (!user) return;
+
     const categoriesQuery = query(collection(firebaseDB, "categories"), orderBy("name", "asc"));
     const unsubscribeCategories = onSnapshot(categoriesQuery, (querySnapshot) => {
       const categoriesData = {};
@@ -86,70 +88,74 @@ export default function Societies() {
       <View style={styles.header}>
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>Societies</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>My Societies</Text>
-        <ScrollView horizontal contentContainerStyle={styles.horizontalScroll} showsHorizontalScrollIndicator={false}>
-          {mySocieties.length > 0 ? (
-            mySocieties.map(society => (
-              <MySocietyCard
-                key={society.id}
-                societyId={society.id}
-                style={styles.card}
-                name={society.name}
-                logo={society.logo}
-              />
-            ))
-          ) : (
-            <Text style={{ color: theme.colors.onBackground }}>You have not joined any societies.</Text>
-          )}
-        </ScrollView>
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>All Societies</Text>
-        <ScrollView
-          horizontal
-          contentContainerStyle={styles.chipContainer}
-          showsHorizontalScrollIndicator={false}
-          ref={scrollViewRef}
-        >
-          {chips
-            .sort((a, b) => (a.name === selectedChip ? -1 : b.name === selectedChip ? 1 : 0))
-            .map(chip => {
-              const isSelected = selectedChip === chip.name;
-              const backgroundColor = `#${chip.backgroundColor}`;
-              const textColor = `#${chip.textColor}`;
-              return (
-                <Chip
-                  key={chip.name}
-                  style={[styles.chip, { backgroundColor }]}
-                  textStyle={{ color: textColor }}
-                  mode="contained"
-                  onPress={() => handleChipPress(chip.name)}
-                  icon={isSelected ? () => <Ionicons name="checkmark" size={16} color={textColor} /> : null}
-                >
-                  {chip.name}
-                </Chip>
-              );
-            })}
-        </ScrollView>
-        {societies
-          .filter(society => !selectedChip || categories[society.category]?.name === selectedChip)
-          .map(society => {
-            const category = categories[society.category];
-            return (
-              <SocietyCard
-                key={society.id}
-                societyId={society.id}
-                style={styles.card}
-                name={society.name}
-                members={`${society.members}`}
-                category={category ? category.name : ''}
-                categoryColor={category ? `#${category.backgroundColor}` : 'lightcoral'}
-                categoryTextColor={category ? `#${category.textColor}` : 'white'}
-                logoUrl={society.logo}
-              />
-            );
-          })}
-      </ScrollView>
-      <SearchButton />
+      {user ? (
+        <>
+          <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>My Societies</Text>
+            <ScrollView horizontal contentContainerStyle={styles.horizontalScroll} showsHorizontalScrollIndicator={false}>
+              {mySocieties.length > 0 ? (
+                mySocieties.map(society => (
+                  <MySocietyCard
+                    key={society.id}
+                    societyId={society.id}
+                    style={styles.card}
+                    name={society.name}
+                    logo={society.logo}
+                  />
+                ))
+              ) : (
+                <Text style={{ color: theme.colors.onBackground }}>You have not joined any societies.</Text>
+              )}
+            </ScrollView>
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>All Societies</Text>
+            <ScrollView
+              horizontal
+              contentContainerStyle={styles.chipContainer}
+              showsHorizontalScrollIndicator={false}
+              ref={scrollViewRef}
+            >
+              {chips
+                .sort((a, b) => (a.name === selectedChip ? -1 : b.name === selectedChip ? 1 : 0))
+                .map(chip => {
+                  const isSelected = selectedChip === chip.name;
+                  const backgroundColor = `#${chip.backgroundColor}`;
+                  const textColor = `#${chip.textColor}`;
+                  return (
+                    <Chip
+                      key={chip.name}
+                      style={[styles.chip, { backgroundColor }]}
+                      textStyle={{ color: textColor }}
+                      mode="contained"
+                      onPress={() => handleChipPress(chip.name)}
+                      icon={isSelected ? () => <Ionicons name="checkmark" size={16} color={textColor} /> : null}
+                    >
+                      {chip.name}
+                    </Chip>
+                  );
+                })}
+            </ScrollView>
+            {societies
+              .filter(society => !selectedChip || categories[society.category]?.name === selectedChip)
+              .map(society => {
+                const category = categories[society.category];
+                return (
+                  <SocietyCard
+                    key={society.id}
+                    societyId={society.id}
+                    style={styles.card}
+                    name={society.name}
+                    members={`${society.members}`}
+                    category={category ? category.name : ''}
+                    categoryColor={category ? `#${category.backgroundColor}` : 'lightcoral'}
+                    categoryTextColor={category ? `#${category.textColor}` : 'white'}
+                    logoUrl={society.logo}
+                  />
+                );
+              })}
+          </ScrollView>
+          <SearchButton />
+        </>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -188,5 +194,10 @@ const styles = StyleSheet.create({
   chip: {
     borderRadius: 25,
     marginRight: 8,
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

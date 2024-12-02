@@ -19,6 +19,8 @@ export default function Events() {
   const userRef = useRef(user);
 
   useEffect(() => {
+    if (!user) return;
+
     const unsubscribeEvents = onSnapshot(collection(firebaseDB, 'events'), async (snapshot) => {
       const eventsData = await Promise.all(snapshot.docs.map(async (eventDoc) => {
         const eventData = eventDoc.data();
@@ -67,48 +69,52 @@ export default function Events() {
           Events
         </Text>
       </View>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}> 
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
-          My Events
-        </Text>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          style={styles.myEventsScroll}>
-          {myEvents.length > 0 ? (
-            myEvents.map((event) => (
-              <MyEventCard
-                key={event.id}
-                eventId={event.id}
-                eventDate={new Date(event.time.seconds * 1000).toLocaleDateString()}
-                eventName={event.name}
-                societyName={event.societyName}
-                circleImageUrl={{ uri: event.societyLogo }}
-              />
-            ))
-          ) : (
-            <Text style={{ color: theme.colors.onBackground }}>You have not joined any events.</Text>
-          )}
-        </ScrollView>
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
-          All Events
-        </Text>
-        <View>
-          {events.map((event) => (
-            <EventCard
-              key={event.id}
-              eventId={event.id}
-              date={new Date(event.time.seconds * 1000).toLocaleDateString()}
-              title={event.name}
-              subtitle={event.societyName}
-              location={event.location}
-              imageUrl={event.backgroundImage}
-              circleImageUrl={{ uri: event.societyLogo }}
-            />
-          ))}
-        </View>
-      </ScrollView>
-      <SearchButton />
+      {user ? (
+        <>
+          <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}> 
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+              My Events
+            </Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              style={styles.myEventsScroll}>
+              {myEvents.length > 0 ? (
+                myEvents.map((event) => (
+                  <MyEventCard
+                    key={event.id}
+                    eventId={event.id}
+                    eventDate={new Date(event.time.seconds * 1000).toLocaleDateString()}
+                    eventName={event.name}
+                    societyName={event.societyName}
+                    circleImageUrl={{ uri: event.societyLogo }}
+                  />
+                ))
+              ) : (
+                <Text style={{ color: theme.colors.onBackground }}>You have not joined any events.</Text>
+              )}
+            </ScrollView>
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+              All Events
+            </Text>
+            <View>
+              {events.map((event) => (
+                <EventCard
+                  key={event.id}
+                  eventId={event.id}
+                  date={new Date(event.time.seconds * 1000).toLocaleDateString()}
+                  title={event.name}
+                  subtitle={event.societyName}
+                  location={event.location}
+                  imageUrl={event.backgroundImage}
+                  circleImageUrl={{ uri: event.societyLogo }}
+                />
+              ))}
+            </View>
+          </ScrollView>
+          <SearchButton />
+        </>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -136,5 +142,10 @@ const styles = StyleSheet.create({
   },
   myEventsScroll: {
     marginBottom: 16,
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

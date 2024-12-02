@@ -37,20 +37,23 @@ export default function Register() {
       router.replace('/home');
     } catch (error) {
       switch (error.code) {
+        case 'auth/invalid-credential':
+          ToastAndroid.show("Invalid email or password", ToastAndroid.SHORT);
+          break;
         case 'auth/invalid-email':
-          ToastAndroid.show("Invalid email address", ToastAndroid.SHORT);
+          ToastAndroid.show("Invalid email", ToastAndroid.SHORT);
           break;
         case 'auth/user-disabled':
-          ToastAndroid.show("User account is disabled", ToastAndroid.SHORT);
+          ToastAndroid.show("Account disabled", ToastAndroid.SHORT);
           break;
         case 'auth/user-not-found':
           ToastAndroid.show("User not found", ToastAndroid.SHORT);
           break;
         case 'auth/wrong-password':
-          ToastAndroid.show("Incorrect password", ToastAndroid.SHORT);
+          ToastAndroid.show("Wrong password", ToastAndroid.SHORT);
           break;
         default:
-          ToastAndroid.show("Error: " + error.message, ToastAndroid.SHORT);
+          ToastAndroid.show(error.message, ToastAndroid.SHORT);
           break;
       }
     }
@@ -80,19 +83,19 @@ export default function Register() {
     } catch (error) {
       switch (error.code) {
         case 'auth/email-already-in-use':
-          ToastAndroid.show("Email is already in use", ToastAndroid.SHORT);
+          ToastAndroid.show("Email in use", ToastAndroid.SHORT);
           break;
         case 'auth/invalid-email':
-          ToastAndroid.show("Invalid email address", ToastAndroid.SHORT);
+          ToastAndroid.show("Invalid email", ToastAndroid.SHORT);
           break;
         case 'auth/operation-not-allowed':
           ToastAndroid.show("Operation not allowed", ToastAndroid.SHORT);
           break;
         case 'auth/weak-password':
-          ToastAndroid.show("Password is too weak", ToastAndroid.SHORT);
+          ToastAndroid.show("Weak password", ToastAndroid.SHORT);
           break;
         default:
-          ToastAndroid.show("Error: " + error.message, ToastAndroid.SHORT);
+          ToastAndroid.show(error.message, ToastAndroid.SHORT);
           break;
       }
     }
@@ -227,7 +230,7 @@ export default function Register() {
                   mode="contained"
                   onPress={() => {
                     if (!email || !password) {
-                      ToastAndroid.show("Email and password cannot be empty", ToastAndroid.SHORT);
+                      ToastAndroid.show("Email and password required", ToastAndroid.SHORT);
                     } else {
                       handleLogin();
                     }
@@ -240,7 +243,7 @@ export default function Register() {
                   mode="outlined"
                   onPress={() => {
                     if (!email || !password) {
-                      ToastAndroid.show("Email and password cannot be empty", ToastAndroid.SHORT);
+                      ToastAndroid.show("Email and password required", ToastAndroid.SHORT);
                     } else {
                       setIsSigningUp(true);
                     }
