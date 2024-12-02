@@ -21,11 +21,11 @@ const Index = () => {
   }, []);
 
   const handleUserSignIn = () => {
-    router.push("/register");
+    router.replace("/register");
   };
 
   const handleSocietySignIn = () => {
-    router.push("/admin");
+    router.replace("/admin");
   };
 
   return (

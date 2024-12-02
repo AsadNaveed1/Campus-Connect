@@ -99,7 +99,7 @@ export default function Register() {
   };
 
   const handleClose = () => {
-    router.back();
+    router.replace('/');
   };
 
   return (

@@ -29,7 +29,7 @@ export default function Admin() {
     if (selectedSociety) {
       const societyDoc = await getDoc(doc(firebaseDB, 'societies', selectedSociety.id));
       if (societyDoc.exists() && societyDoc.data().passkey === password) {
-        router.push({ pathname: '/societyAdmin', params: { societyId: selectedSociety.id } });
+        router.replace({ pathname: '/societyAdmin', params: { societyId: selectedSociety.id } });
       } else {
         ToastAndroid.show('Incorrect password', ToastAndroid.SHORT);
       }
@@ -42,7 +42,7 @@ export default function Admin() {
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Ionicons name="close" size={24} color={theme.colors.onBackground} onPress={() => router.back()} />
+          <Ionicons name="close" size={24} color={theme.colors.onBackground} onPress={() => router.replace('/')} />
         </View>
         <View style={styles.content}>
           <View style={styles.inputContainer}>
