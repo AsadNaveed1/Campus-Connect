@@ -123,7 +123,7 @@ const SocietyPage = () => {
           <Image
             source={{ uri: societyData.logo }}
             style={styles.logo}
-            resizeMode="contain"
+            resizeMode="cover"
           />
         </View>
       </ImageBackground>

@@ -25,6 +25,8 @@ export default function RootLayout() {
               <Stack.Screen name="societyPage" options={{ headerShown: false }} />
               <Stack.Screen name="merchPage" options={{ headerShown: false }} />
               <Stack.Screen name="eventAdmin" options={{ headerShown: false }} />
+              <Stack.Screen name="postAdmin" options={{ headerShown: false }} />
+              <Stack.Screen name="merchAdmin" options={{ headerShown: false }} />
             </Stack>
           </SafeAreaProvider>
         </PaperProvider>

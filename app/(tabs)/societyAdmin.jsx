@@ -166,11 +166,14 @@ const SocietyAdmin = () => {
         return (
           <PostCard 
             key={item.id} 
+            postId={item.id}
             image={item.image} 
             caption={item.caption} 
             societyName={societyData.name}
             date={formattedDate}
-            minimal
+            minimal={true}
+            admin={true}
+            societyId={societyId}
           />
         );
       })}

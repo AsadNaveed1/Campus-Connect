@@ -10,7 +10,7 @@ const PostCard = ({ postId, caption, image, societyName, date, minimal, admin, s
 
   const handlePress = () => {
     if (admin) {
-      router.push({ pathname: '/postAdmin', params: { societyId, postId } });
+      router.push({ pathname: '/postAdmin', params: { postId, societyId } });
     } else {
       setExpanded(!expanded);
     }

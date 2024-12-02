@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   circleImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   detailsContainer: {
     padding: 15,

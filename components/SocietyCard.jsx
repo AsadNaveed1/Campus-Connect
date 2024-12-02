@@ -30,7 +30,7 @@ export default function SocietyCard(props) {
         </View>
       </View>
       <View style={styles.logoContainer}>
-        <Image source={{ uri: logoUrl }} style={styles.logo} resizeMode="contain" />
+        <Image source={{ uri: logoUrl }} style={styles.logo} resizeMode="cover" />
       </View>
     </Pressable>
   );

@@ -23,7 +23,7 @@ export default function MySocietyCard(props) {
       ]}
     >
       <View style={[styles.logoContainer, { borderColor: theme.colors.surface }]}>
-        <Image source={{ uri:props.logo}} style={styles.logo} resizeMode="contain" />
+        <Image source={{ uri:props.logo}} style={styles.logo} resizeMode="cover" />
       </View>
       <Text 
         style={[styles.name, { color: theme.colors.onSurface }]}
