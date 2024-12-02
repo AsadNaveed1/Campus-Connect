@@ -171,6 +171,12 @@ const EventPage = () => {
             onPress={handleBackButton}
             style={styles.backButton}
           />
+          <IconButton
+            icon={() => <Ionicons name="qr-code" size={18} color="#fff" />}
+            size={24}
+            onPress={toggleQrDialog}
+            style={styles.qrButton}
+          />
         </View>
         <View style={styles.circleImageContainer}>
           <Image source={{ uri: societyData.logo }} style={styles.circleImage} />
@@ -179,12 +185,6 @@ const EventPage = () => {
           <View style={styles.detailsHeader}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text variant="titleLarge" style={[styles.title, { color: theme.colors.onSurface }]}>{eventData.name}</Text>
-              <IconButton
-                icon={() => <Ionicons name="qr-code" size={16} color="grey" />}
-                size={18}
-                style={[styles.qrButton, { backgroundColor: 'rgba(128, 128, 128, 0.1)', borderRadius: 50, alignSelf: 'baseline' }]}
-                onPress={toggleQrDialog}
-              />
             </View>
             <View style={[styles.feeBadge, { backgroundColor: theme.colors.surface }]}>
               <Text variant="bodyMedium" style={[styles.feeText, { color: theme.colors.onSurface, fontWeight: 'bold' }]}>${eventData.fee}</Text>
@@ -266,6 +266,15 @@ const styles = StyleSheet.create({
     left: 16,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 20,
+    zIndex: 1,
+  },
+  qrButton: {
+    position: 'absolute',
+    top: 20,
+    right: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    zIndex: 1,
   },
   circleImage: {
     width: '100%',
@@ -346,9 +355,6 @@ const styles = StyleSheet.create({
   joinButton: {
     flex: 1,
     marginRight: 8,
-  },
-  qrButton: {
-    
   },
   qrDialog: {
     borderRadius: 15,

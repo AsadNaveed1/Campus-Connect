@@ -159,6 +159,13 @@ const SocietyPage = () => {
         style={styles.backButton}
       />
 
+      <IconButton
+        icon={() => <Ionicons name="qr-code" size={18} color="#fff" />}
+        size={24}
+        onPress={toggleQrDialog}
+        style={styles.qrButton}
+      />
+
       <ImageBackground
         source={{ uri: societyData.backgroundImage }}
         style={styles.societyInfo}
@@ -178,12 +185,6 @@ const SocietyPage = () => {
           <Text style={[styles.name, { color: theme.colors.onBackground }]}>
             {societyData.name}
           </Text>
-          <IconButton
-            icon={() => <Ionicons name="qr-code" size={16} color="grey" />}
-            size={18}
-            style={[styles.qrButton, { backgroundColor: 'rgba(128, 128, 128, 0.1)' }]}
-            onPress={toggleQrDialog}
-          />
         </View>
         <View style={styles.tagsContainer}>
           <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>{categoryName}</Text>
@@ -339,6 +340,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     zIndex: 1,
   },
+  qrButton: {
+    position: 'absolute',
+    top: 20,
+    right: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    zIndex: 1,
+  },
   logoContainer: {
     width: 90,
     height: 90,
@@ -367,10 +376,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'baseline',
+    paddingHorizontal: 15,
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   details: {
     fontSize: 12,
@@ -436,10 +447,6 @@ const styles = StyleSheet.create({
     width: '40%',
     alignSelf: 'center',
     marginBottom: 4,
-  },
-  qrButton: {
-    borderRadius: 20,
-    padding: 5,
   },
   qrDialog: {
     borderRadius: 15,
