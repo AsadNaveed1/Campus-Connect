@@ -203,7 +203,7 @@ const SocietyAdmin = () => {
       <TextInput
         style={[styles.input]}
         mode="outlined"
-        label="Society Name"
+        label="Name"
         value={societyData.name}
         onChangeText={(text) => setSocietyData({ ...societyData, name: text })}
         theme={{ roundness: 15 }}
@@ -287,7 +287,7 @@ const SocietyAdmin = () => {
             </View>
           </View>
           <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
-            {societyData.name} Admin Panel
+            {societyData.name}
           </Text>
         </View>
         <View style={styles.tabContainer}>
