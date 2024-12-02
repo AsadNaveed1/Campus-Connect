@@ -3,8 +3,10 @@ import { View, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground,
 import { useTheme, Text, IconButton, Button, ActivityIndicator, Dialog, Portal } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { firebaseDB } from '../firebaseConfig';
+import { getAuth } from 'firebase/auth';
+import { useUserContext } from '../contexts/UserContext';
 import EventCard from '../components/EventCard';
 import MerchCard from '../components/MerchCard';
 import PostCard from '../components/PostCard';
@@ -14,6 +16,8 @@ const SocietyPage = () => {
   const theme = useTheme();
   const router = useRouter();
   const { societyId } = useLocalSearchParams();
+  const { user, setUser } = useUserContext();
+  const auth = getAuth();
   const [activeTab, setActiveTab] = useState('Posts');
   const [societyData, setSocietyData] = useState(null);
   const [categoryName, setCategoryName] = useState('');
@@ -22,6 +26,7 @@ const SocietyPage = () => {
   const [merch, setMerch] = useState([]);
   const [posts, setPosts] = useState([]);
   const [qrVisible, setQrVisible] = useState(false);
+  const [hasJoined, setHasJoined] = useState(false);
 
   const screenWidth = Dimensions.get('window').width;
   const qrCodeSize = screenWidth * 0.6;
@@ -89,6 +94,38 @@ const SocietyPage = () => {
     }
   }, [societyId]);
 
+  useEffect(() => {
+    if (user && user.joinedSocieties.includes(societyId)) {
+      setHasJoined(true);
+    }
+  }, [user, societyId]);
+
+  const handleJoinButton = async () => {
+    if (!auth.currentUser) {
+      console.error('User not authenticated');
+      return;
+    }
+    setHasJoined(true);
+    const userDocRef = doc(firebaseDB, 'users', auth.currentUser.email);
+    await updateDoc(userDocRef, {
+      joinedSocieties: arrayUnion(societyId),
+    });
+    setUser({ ...user, joinedSocieties: [...user.joinedSocieties, societyId] });
+  };
+
+  const handleLeaveButton = async () => {
+    if (!auth.currentUser) {
+      console.error('User not authenticated');
+      return;
+    }
+    setHasJoined(false);
+    const userDocRef = doc(firebaseDB, 'users', auth.currentUser.email);
+    await updateDoc(userDocRef, {
+      joinedSocieties: arrayRemove(societyId),
+    });
+    setUser({ ...user, joinedSocieties: user.joinedSocieties.filter(id => id !== societyId) });
+  };
+
   const handleBackButton = () => {
     router.back();
   };
@@ -140,7 +177,6 @@ const SocietyPage = () => {
             onPress={toggleQrDialog}
           />
         </View>
-        <Button mode="text" style={styles.joinButton}>Join Us</Button>
         <View style={styles.tagsContainer}>
           <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>{societyData.members} Members</Text>
           <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>{categoryName}</Text>
@@ -148,6 +184,20 @@ const SocietyPage = () => {
         <Text style={[styles.details, { color: theme.colors.onBackground }]}>
           {societyData.description}
         </Text>
+        <Button
+          mode="text"
+          onPress={hasJoined ? handleLeaveButton : handleJoinButton}
+          style={styles.joinButton}
+          icon={() => (
+            <Ionicons
+              name={hasJoined ? "checkmark" : "add"}
+              size={20}
+              color={theme.colors.primary}
+            />
+          )}
+        >
+          {hasJoined ? "Joined" : "Join Us"}
+        </Button>
       </View>
     </>
   );
@@ -319,8 +369,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 24,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 16,
     paddingHorizontal: 10,
+    marginBottom: 4,
   },
   tagsContainer: {
     flexDirection: 'row',
@@ -340,7 +391,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    marginVertical: 2,
     width: '75%',
     alignSelf: 'center',
   },
@@ -356,7 +406,7 @@ const styles = StyleSheet.create({
   },
   postsContainer: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingVertical: 16,
   },
   merchContainer: {
@@ -376,8 +426,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   joinButton: {
-    marginBottom: 8,
-    paddingHorizontal: 20,
+    width: '40%',
+    alignSelf: 'center',
+    marginBottom: 4,
   },
   qrButton: {
     borderRadius: 20,

@@ -3,18 +3,23 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, Text, Chip } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
+import { useAuthContext } from "../../contexts/AuthContext";
 import SocietyCard from "../../components/SocietyCard";
 import MySocietyCard from "../../components/MySocietyCard";
 import SearchButton from '../../components/SearchButton';
 
 export default function Societies() {
   const theme = useTheme();
+  const user = useAuthContext();
   const [chips, setChips] = useState([]);
   const [selectedChip, setSelectedChip] = useState(null);
   const [societies, setSocieties] = useState([]);
+  const [mySocieties, setMySocieties] = useState([]);
   const [categories, setCategories] = useState({});
+  const societiesRef = useRef([]);
+  const userRef = useRef(user);
   const scrollViewRef = useRef(null);
 
   useEffect(() => {
@@ -31,14 +36,37 @@ export default function Societies() {
     const societiesQuery = query(collection(firebaseDB, "societies"), orderBy("name", "asc"));
     const unsubscribeSocieties = onSnapshot(societiesQuery, (querySnapshot) => {
       const societiesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      societiesRef.current = societiesData;
       setSocieties(societiesData);
+
+      if (userRef.current && userRef.current.joinedSocieties) {
+        const joinedSocieties = societiesData.filter(society => userRef.current.joinedSocieties.includes(society.id));
+        setMySocieties(joinedSocieties);
+      }
+    });
+
+    const unsubscribeUser = onSnapshot(doc(firebaseDB, 'users', user.email), (userDoc) => {
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        userRef.current = userData;
+        const joinedSocieties = societiesRef.current.filter(society => userData.joinedSocieties.includes(society.id));
+        setMySocieties(joinedSocieties);
+      }
     });
 
     return () => {
       unsubscribeCategories();
       unsubscribeSocieties();
+      unsubscribeUser();
     };
-  }, []);
+  }, [user]);
+
+  useEffect(() => {
+    if (user && user.joinedSocieties) {
+      const joinedSocieties = societies.filter(society => user.joinedSocieties.includes(society.id));
+      setMySocieties(joinedSocieties);
+    }
+  }, [societies, user]);
 
   const handleChipPress = (chipName) => {
     if (chipName === selectedChip) {
@@ -61,10 +89,8 @@ export default function Societies() {
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>My Societies</Text>
         <ScrollView horizontal contentContainerStyle={styles.horizontalScroll} showsHorizontalScrollIndicator={false}>
-          {societies
-          .map(society => {
-            const category = categories[society.category];
-            return (
+          {mySocieties.length > 0 ? (
+            mySocieties.map(society => (
               <MySocietyCard
                 key={society.id}
                 societyId={society.id}
@@ -72,8 +98,10 @@ export default function Societies() {
                 name={society.name}
                 logo={society.logo}
               />
-            );
-          })}
+            ))
+          ) : (
+            <Text style={{ color: theme.colors.onBackground }}>You have not joined any societies.</Text>
+          )}
         </ScrollView>
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>All Societies</Text>
         <ScrollView

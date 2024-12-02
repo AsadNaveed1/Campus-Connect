@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthContext } from "../../contexts/AuthContext";
@@ -14,9 +14,12 @@ export default function Events() {
   const user = useAuthContext();
   const theme = useTheme();
   const [events, setEvents] = useState([]);
+  const [myEvents, setMyEvents] = useState([]);
+  const eventsRef = useRef([]);
+  const userRef = useRef(user);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(firebaseDB, 'events'), async (snapshot) => {
+    const unsubscribeEvents = onSnapshot(collection(firebaseDB, 'events'), async (snapshot) => {
       const eventsData = await Promise.all(snapshot.docs.map(async (eventDoc) => {
         const eventData = eventDoc.data();
         const societyDoc = await getDoc(doc(firebaseDB, 'societies', eventData.society));
@@ -29,13 +32,33 @@ export default function Events() {
         };
       }));
       eventsData.sort((a, b) => a.time.seconds - b.time.seconds);
+      eventsRef.current = eventsData;
       setEvents(eventsData);
+
+      if (userRef.current && userRef.current.joinedEvents) {
+        const joinedEvents = eventsData.filter(event => userRef.current.joinedEvents.includes(event.id));
+        setMyEvents(joinedEvents);
+      }
     }, (error) => {
       console.error("Error fetching events:", error);
     });
 
-    return () => unsubscribe();
-  }, []);
+    const unsubscribeUser = onSnapshot(doc(firebaseDB, 'users', user.email), (userDoc) => {
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        userRef.current = userData;
+        const joinedEvents = eventsRef.current.filter(event => userData.joinedEvents.includes(event.id));
+        setMyEvents(joinedEvents);
+      }
+    }, (error) => {
+      console.error("Error fetching user data:", error);
+    });
+
+    return () => {
+      unsubscribeEvents();
+      unsubscribeUser();
+    };
+  }, [user]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -52,34 +75,20 @@ export default function Events() {
           horizontal 
           showsHorizontalScrollIndicator={false} 
           style={styles.myEventsScroll}>
-          {/* <MyEventCard
-            circleImageUrl={require('../../assets/images/hku.png')}
-            eventName="Event Name"
-            societyName="Society Name"
-            eventDate="25/09/2024"
-          />
-          <MyEventCard
-            circleImageUrl={require('../../assets/images/hku.png')}
-            eventName="Another Event"
-            societyName="Another Society"
-            eventDate="30/09/2024"
-          />
-          <MyEventCard
-            circleImageUrl={require('../../assets/images/hku.png')}
-            eventName="Yet Another Event"
-            societyName="Cool Society"
-            eventDate="05/10/2024"
-          /> */}
-          {events.map((event) => (
-            <MyEventCard
-              key={event.id}
-              eventId={event.id}
-              eventDate={new Date(event.time.seconds * 1000).toLocaleDateString()}
-              eventName={event.name}
-              societyName={event.societyName}
-              circleImageUrl={{ uri: event.societyLogo }}
-            />
-          ))}
+          {myEvents.length > 0 ? (
+            myEvents.map((event) => (
+              <MyEventCard
+                key={event.id}
+                eventId={event.id}
+                eventDate={new Date(event.time.seconds * 1000).toLocaleDateString()}
+                eventName={event.name}
+                societyName={event.societyName}
+                circleImageUrl={{ uri: event.societyLogo }}
+              />
+            ))
+          ) : (
+            <Text style={{ color: theme.colors.onBackground }}>You have not joined any events.</Text>
+          )}
         </ScrollView>
         <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
           All Events

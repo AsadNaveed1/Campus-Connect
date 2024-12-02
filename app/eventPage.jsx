@@ -5,8 +5,10 @@ import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Notifications from 'expo-notifications';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { firebaseDB } from '../firebaseConfig';
+import { useUserContext } from '../contexts/UserContext';
 import MapCard from '../components/MapCard';
 
 const { height: screenHeight } = Dimensions.get('window');
@@ -15,11 +17,13 @@ const EventPage = () => {
   const { eventId } = useLocalSearchParams();
   const theme = useTheme();
   const router = useRouter();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const { user, setUser } = useUserContext();
+  const auth = getAuth();
   const [eventData, setEventData] = useState(null);
   const [societyData, setSocietyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hasJoined, setHasJoined] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -45,6 +49,12 @@ const EventPage = () => {
       fetchEventData();
     }
   }, [eventId]);
+
+  useEffect(() => {
+    if (user && user.joinedEvents.includes(eventId)) {
+      setHasJoined(true);
+    }
+  }, [user, eventId]);
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -94,13 +104,31 @@ const EventPage = () => {
   };
 
   const handleJoinButton = async () => {
+    if (!auth.currentUser) {
+      console.error('User not authenticated');
+      return;
+    }
     setHasJoined(true);
     await enableNotifications();
+    const userDocRef = doc(firebaseDB, 'users', auth.currentUser.email);
+    await updateDoc(userDocRef, {
+      joinedEvents: arrayUnion(eventId),
+    });
+    setUser({ ...user, joinedEvents: [...user.joinedEvents, eventId] });
   };
 
   const handleLeaveButton = async () => {
+    if (!auth.currentUser) {
+      console.error('User not authenticated');
+      return;
+    }
     setHasJoined(false);
     await disableNotifications();
+    const userDocRef = doc(firebaseDB, 'users', auth.currentUser.email);
+    await updateDoc(userDocRef, {
+      joinedEvents: arrayRemove(eventId),
+    });
+    setUser({ ...user, joinedEvents: user.joinedEvents.filter(id => id !== eventId) });
   };
 
   const handleBackButton = () => {

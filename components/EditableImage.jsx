@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: 'lightgrey',
+    backgroundColor: 'white',
   },
   pressable: {
     flex: 1,
