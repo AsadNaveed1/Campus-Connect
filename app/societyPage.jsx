@@ -178,7 +178,6 @@ const SocietyPage = () => {
           />
         </View>
         <View style={styles.tagsContainer}>
-          <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>{societyData.members} Members</Text>
           <Text style={[styles.tag, { backgroundColor: theme.colors.primaryContainer, color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }]}>{categoryName}</Text>
         </View>
         <Text style={[styles.details, { color: theme.colors.onBackground }]}>

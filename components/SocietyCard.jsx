@@ -4,7 +4,7 @@ import { Text, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
 export default function SocietyCard(props) {
-  const { societyId, name, members, category, categoryColor, categoryTextColor, logoUrl } = props;
+  const { societyId, name, category, categoryColor, categoryTextColor, logoUrl } = props;
   const theme = useTheme();
   const router = useRouter();
 
@@ -24,7 +24,6 @@ export default function SocietyCard(props) {
     >
       <View style={styles.textContainer}>
         <Text style={[styles.name, { color: theme.colors.onSurface }]}>{name}</Text>
-        <Text style={[styles.members, { color: theme.colors.onSurfaceVariant }]}>{members} members</Text>
         <View style={[styles.categoryLabel, { backgroundColor: categoryColor }]}>
           <Text style={[styles.category, { color: categoryTextColor }]}>{category}</Text>
         </View>
@@ -78,8 +77,5 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 10,
     fontWeight: "bold",
-  },
-  members: {
-    fontSize: 12,
   },
 });
