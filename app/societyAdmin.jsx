@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, ToastAndroid } from 'react-native';
-import { useTheme, Text, ActivityIndicator, Button, TextInput, Menu } from 'react-native-paper';
+import { useTheme, Text, ActivityIndicator, Button, TextInput, Menu, IconButton } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot, getDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -264,6 +264,12 @@ const SocietyAdmin = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <IconButton
+        icon={() => <Ionicons name="chevron-back" size={24} color="#fff" />}
+        size={24}
+        onPress={() => router.replace('/')}
+        style={styles.backButton}
+      />
       <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
         <View style={styles.fixedHeader}>
           <View style={styles.bannerContainer}>
@@ -476,6 +482,14 @@ const styles = StyleSheet.create({
   newEventButton: {
     flex: 1,
     marginHorizontal: 8,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    zIndex: 1,
   },
 });
 

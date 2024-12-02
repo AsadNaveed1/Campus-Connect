@@ -38,8 +38,11 @@ const Index = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.container}>
+        <Text variant="titleMedium" style={[styles.subtitle, { color: theme.colors.onBackground }]}>
+          Welcome to
+        </Text>
         <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
-          Welcome to Campus Connect
+          Campus Connect
         </Text>
         <Button mode="contained" onPress={handleUserSignIn} style={styles.button}>
           Sign in as User
@@ -58,6 +61,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+  },
+  subtitle: {
+    marginBottom: 8,
+    fontWeight: "bold",
   },
   title: {
     marginBottom: 24,
