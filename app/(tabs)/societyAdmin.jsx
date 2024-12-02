@@ -73,7 +73,7 @@ const SocietyAdmin = () => {
         const postPromises = postIds.map(postId => getDoc(doc(firebaseDB, 'posts', postId)));
         const postDocs = await Promise.all(postPromises);
         const postData = postDocs.map(postDoc => ({ id: postDoc.id, ...postDoc.data() }));
-        postData.sort((a, b) => b.date.seconds - a.date.seconds); // Sort posts by date (newest first)
+        postData.sort((a, b) => b.date.seconds - a.date.seconds);
         setPosts(postData);
       } catch (error) {
         console.error('Error fetching post details:', error);
@@ -85,7 +85,7 @@ const SocietyAdmin = () => {
         const merchPromises = merchIds.map(merchId => getDoc(doc(firebaseDB, 'merch', merchId)));
         const merchDocs = await Promise.all(merchPromises);
         const merchData = merchDocs.map(merchDoc => ({ id: merchDoc.id, ...merchDoc.data() }));
-        merchData.sort((a, b) => a.name.localeCompare(b.name)); // Sort merch by name
+        merchData.sort((a, b) => a.name.localeCompare(b.name));
         setMerch(merchData);
       } catch (error) {
         console.error('Error fetching merch details:', error);
@@ -169,7 +169,6 @@ const SocietyAdmin = () => {
             postId={item.id}
             image={item.image} 
             caption={item.caption} 
-            societyName={societyData.name}
             date={formattedDate}
             minimal={true}
             admin={true}
@@ -287,7 +286,7 @@ const SocietyAdmin = () => {
             </View>
           </View>
           <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onBackground }]}>
-            {societyData.name}
+            Manage Society
           </Text>
         </View>
         <View style={styles.tabContainer}>
@@ -381,7 +380,7 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     width: '100%',
-    height: 160,
+    height: 180,
   },
   logoWrapper: {
     position: 'absolute',
@@ -400,7 +399,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   title: {
-    marginTop: 72,
+    marginTop: 48,
     marginBottom: 16,
     fontSize: 24,
     fontWeight: 'bold',
