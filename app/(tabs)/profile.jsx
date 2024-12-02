@@ -30,7 +30,7 @@ export default function Profile() {
       setBio(user.bio);
       setDegree(user.degree);
       setMajor(user.major);
-      setYear(user.year.toString());
+      setYear(user.year);
       setUniversityID(user.universityID);
       setProfilePicture(user.profilePicture);
     }
@@ -41,7 +41,7 @@ export default function Profile() {
       await signOut(auth);
       setUser(null);
       ToastAndroid.show("Logged out", ToastAndroid.SHORT);
-      router.push('/register');
+      router.replace('/');
     } catch (error) {
       ToastAndroid.show("Error: " + error.message, ToastAndroid.SHORT);
     }
@@ -51,7 +51,7 @@ export default function Profile() {
     try {
       const currentUser = auth.currentUser;
       const userDocRef = doc(firebaseDB, "users", currentUser.email);
-      const updatedUserData = { name, bio, degree, major, year: parseInt(year, 10), universityID, profilePicture };
+      const updatedUserData = { name, bio, degree, major, year, universityID, profilePicture };
       await updateDoc(userDocRef, updatedUserData);
       setUser(updatedUserData);
       ToastAndroid.show("Profile updated", ToastAndroid.SHORT);
@@ -67,10 +67,6 @@ export default function Profile() {
     setIsEditable(!isEditable);
   };
 
-  const handleSignIn = () => {
-    router.push('/register');
-  };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.header}>
@@ -82,12 +78,7 @@ export default function Profile() {
               {user ? (
                 <>
                   <View style={styles.imageContainer}>
-                    <EditableImage 
-                      imageUri={profilePicture} 
-                      setImageUri={setProfilePicture} 
-                      editable={isEditable} 
-                      imagePath={auth.currentUser ? `users/profilePictures/${auth.currentUser.email}` : ''} 
-                    />
+                    <EditableImage imageUri={profilePicture} setImageUri={setProfilePicture} editable={isEditable} imagePath={`users/profilePictures/${auth.currentUser.email}`} />
                   </View>
                   <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
                     <TextInput
@@ -134,8 +125,7 @@ export default function Profile() {
                         mode="outlined"
                         label="Year"
                         value={year}
-                        onChangeText={(text) => setYear(text.replace(/[^0-9]/g, ''))}
-                        keyboardType="numeric"
+                        onChangeText={setYear}
                         placeholderTextColor={theme.colors.placeholder}
                         outlineColor={isEditable ? theme.colors.outline : 'transparent'}
                         theme={{ roundness: 15, colors: { background: 'transparent' } }}
@@ -188,20 +178,7 @@ export default function Profile() {
                     </View>
                   </View>
                 </>
-              ) : (
-                <View style={styles.signInButton}>
-                  <Text variant="bodyMedium" style={[styles.signInPrompt, { color: theme.colors.onBackground }]}>
-                    Sign-in to see your profile.
-                  </Text>
-                  <Button
-                    mode="contained"
-                    onPress={handleSignIn}
-                    icon={() => <Ionicons name="person-circle-outline" size={24} color={theme.colors.onPrimary} />}
-                  >
-                    Sign-in
-                  </Button>
-                </ View>
-              )}
+              ) : null}
           </View>
         </View>
       </ScrollView>

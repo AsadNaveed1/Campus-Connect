@@ -34,7 +34,7 @@ export default function Register() {
         setUser(userData);
       }
       ToastAndroid.show("Logged in", ToastAndroid.SHORT);
-      router.back();
+      router.replace('/home');
     } catch (error) {
       switch (error.code) {
         case 'auth/invalid-email':
@@ -76,7 +76,7 @@ export default function Register() {
       await setDoc(doc(firebaseDB, "users", user.email), userData);
       setUser(userData);
       ToastAndroid.show("Account created", ToastAndroid.SHORT);
-      router.back();
+      router.replace('/home');
     } catch (error) {
       switch (error.code) {
         case 'auth/email-already-in-use':

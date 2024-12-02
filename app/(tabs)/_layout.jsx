@@ -63,15 +63,6 @@ export default function TabLayout() {
           tabBarButton: renderTabBarButton,
         }}
       />
-      <Tabs.Screen
-        name="societyLogin"
-        options={{
-          title: 'Society Login',
-          headerShown: false,
-          tabBarIcon: ({ focused, color }) => renderTabBarIcon('add', focused, color),
-          tabBarButton: renderTabBarButton,
-        }}
-      />
     </Tabs>
   );
 }

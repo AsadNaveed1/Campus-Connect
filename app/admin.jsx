@@ -3,11 +3,11 @@ import { View, StyleSheet, ToastAndroid } from 'react-native';
 import { Text, TextInput, Button, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { collection, query, onSnapshot, doc, getDoc } from 'firebase/firestore';
-import { firebaseDB } from '../../firebaseConfig';
+import { firebaseDB } from '../firebaseConfig';
 import { Dropdown } from 'react-native-paper-dropdown';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function SocietyLogin() {
+export default function Admin() {
   const theme = useTheme();
   const router = useRouter();
   const [societies, setSocieties] = useState([]);
