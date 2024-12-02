@@ -1,14 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text, useTheme } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { useUserContext } from "../contexts/UserContext";
+import { onAuthStateChanged } from "firebase/auth";
+import { firebaseAuth } from "../firebaseConfig";
 
 const Index = () => {
   const theme = useTheme();
   const router = useRouter();
-  const { user } = useUserContext();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      if (user) {
+        router.replace("/home");
+      }
+      unsubscribe();
+    });
+  }, []);
 
   const handleUserSignIn = () => {
     router.push("/register");

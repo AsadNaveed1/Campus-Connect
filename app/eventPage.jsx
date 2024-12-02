@@ -28,6 +28,10 @@ const EventPage = () => {
   const [qrVisible, setQrVisible] = useState(false);
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     const fetchEventData = async () => {
       try {
         const eventDoc = await getDoc(doc(firebaseDB, 'events', eventId));
@@ -50,7 +54,7 @@ const EventPage = () => {
     if (eventId) {
       fetchEventData();
     }
-  }, [eventId]);
+  }, [eventId, user]);
 
   useEffect(() => {
     if (user && user.joinedEvents.includes(eventId)) {
@@ -140,6 +144,10 @@ const EventPage = () => {
   const toggleQrDialog = () => {
     setQrVisible(!qrVisible);
   };
+
+  if (!user) {
+    return;
+  }
 
   if (loading) {
     return (

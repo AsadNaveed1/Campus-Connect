@@ -32,6 +32,10 @@ const SocietyPage = () => {
   const qrCodeSize = screenWidth * 0.6;
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     const fetchSocietyData = async () => {
       try {
         const societyDoc = await getDoc(doc(firebaseDB, 'societies', societyId));
@@ -92,7 +96,7 @@ const SocietyPage = () => {
     if (societyId) {
       fetchSocietyData();
     }
-  }, [societyId]);
+  }, [societyId, user]);
 
   useEffect(() => {
     if (user && user.joinedSocieties.includes(societyId)) {
@@ -133,6 +137,10 @@ const SocietyPage = () => {
   const toggleQrDialog = () => {
     setQrVisible(!qrVisible);
   };
+
+  if (!user) {
+    return;
+  }
 
   if (loading) {
     return (

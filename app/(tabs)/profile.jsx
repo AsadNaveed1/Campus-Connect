@@ -7,11 +7,13 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useUserContext } from "../../contexts/UserContext";
+import { useAuthContext } from "../../contexts/AuthContext";
 import { firebaseDB } from "../../firebaseConfig";
 import EditableImage from "../../components/EditableImage";
 
 export default function Profile() {
-  const auth = getAuth();
+  const auth = useAuthContext();
+  const authObj = getAuth();
   const router = useRouter();
   const theme = useTheme();
   const { user, setUser } = useUserContext();
@@ -27,7 +29,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
-        const userDocRef = doc(firebaseDB, "users", auth.currentUser.email);
+        const userDocRef = doc(firebaseDB, "users", auth.email);
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
           const userData = userDoc.data();
@@ -48,7 +50,7 @@ export default function Profile() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await signOut(authObj);
       setUser(null);
       ToastAndroid.show("Logged out", ToastAndroid.SHORT);
       router.replace('/');
@@ -59,11 +61,25 @@ export default function Profile() {
 
   const handleUpdate = async () => {
     try {
-      const userDocRef = doc(firebaseDB, "users", auth.currentUser.email);
-      const updatedUserData = { name, bio, degree, major, year, universityID, profilePicture };
-      await updateDoc(userDocRef, updatedUserData);
-      setUser(updatedUserData);
-      ToastAndroid.show("Profile updated", ToastAndroid.SHORT);
+      const userDocRef = doc(firebaseDB, "users", auth.email);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const updatedUserData = {
+          name,
+          bio,
+          degree,
+          major,
+          year,
+          universityID,
+          profilePicture,
+          joinedEvents: userData.joinedEvents || [],
+          joinedSocieties: userData.joinedSocieties || []
+        };
+        await updateDoc(userDocRef, updatedUserData);
+        setUser(updatedUserData);
+        ToastAndroid.show("Profile updated", ToastAndroid.SHORT);
+      }
     } catch (error) {
       ToastAndroid.show("Error: " + error.message, ToastAndroid.SHORT);
     }
@@ -87,7 +103,7 @@ export default function Profile() {
               {user ? (
                 <>
                   <View style={styles.imageContainer}>
-                    <EditableImage imageUri={profilePicture} setImageUri={setProfilePicture} editable={isEditable} imagePath={`users/profilePictures/${auth.currentUser.email}`} />
+                    <EditableImage imageUri={profilePicture} setImageUri={setProfilePicture} editable={isEditable} imagePath={`users/profilePictures/${auth.email}`} />
                   </View>
                   <View style={[styles.card, {backgroundColor: theme.colors.surface}]}>
                     <TextInput
