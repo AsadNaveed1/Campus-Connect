@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
     padding: 24,
     elevation: 5,
     borderBottomWidth: 0,
+    elevation: 5,
   },
   text: {
     fontWeight: 'bold',

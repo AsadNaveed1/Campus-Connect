@@ -66,8 +66,11 @@ export default function Register() {
         bio: bio,
         degree: degree,
         major: major,
-        year: year,
-        universityID: universityID
+        year: parseInt(year, 10),
+        universityID: universityID,
+        joinedEvents: [],
+        joinedSocieties: [],
+        profilePicture: ""
       };
 
       await setDoc(doc(firebaseDB, "users", user.email), userData);
@@ -128,17 +131,6 @@ export default function Register() {
                 <TextInput
                   style={styles.input}
                   mode="outlined"
-                  label="Bio"
-                  value={bio}
-                  multiline={true}
-                  onChangeText={setBio}
-                  placeholderTextColor={theme.colors.placeholder}
-                  outlineColor={theme.colors.outline}
-                  theme={{ roundness: 15 }}
-                />
-                <TextInput
-                  style={styles.input}
-                  mode="outlined"
                   label="Degree"
                   value={degree}
                   onChangeText={setDegree}
@@ -161,7 +153,8 @@ export default function Register() {
                   mode="outlined"
                   label="Year"
                   value={year}
-                  onChangeText={setYear}
+                  onChangeText={(text) => setYear(text.replace(/[^0-9]/g, ''))}
+                  keyboardType="numeric"
                   placeholderTextColor={theme.colors.placeholder}
                   outlineColor={theme.colors.outline}
                   theme={{ roundness: 15 }}
@@ -172,6 +165,17 @@ export default function Register() {
                   label="University ID"
                   value={universityID}
                   onChangeText={setUniversityID}
+                  placeholderTextColor={theme.colors.placeholder}
+                  outlineColor={theme.colors.outline}
+                  theme={{ roundness: 15 }}
+                />
+                <TextInput
+                  style={styles.input}
+                  mode="outlined"
+                  label="Bio"
+                  value={bio}
+                  multiline={true}
+                  onChangeText={setBio}
                   placeholderTextColor={theme.colors.placeholder}
                   outlineColor={theme.colors.outline}
                   theme={{ roundness: 15 }}
