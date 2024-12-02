@@ -13,7 +13,6 @@ import EditableImage from "../../components/EditableImage";
 
 export default function Profile() {
   const auth = useAuthContext();
-  const authObj = getAuth();
   const router = useRouter();
   const theme = useTheme();
   const { user, setUser } = useUserContext();
@@ -50,6 +49,7 @@ export default function Profile() {
 
   const handleLogout = async () => {
     try {
+      const authObj = getAuth();
       await signOut(authObj);
       setUser(null);
       ToastAndroid.show("Logged out", ToastAndroid.SHORT);

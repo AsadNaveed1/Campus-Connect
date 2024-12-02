@@ -134,6 +134,10 @@ const SocietyAdmin = () => {
     }
   };
 
+  const handleLogout = () => {
+    router.replace('/');
+  };
+
   const renderEvents = () => (
     <View style={styles.eventsContainer}>
       {events.map(event => (
@@ -265,10 +269,10 @@ const SocietyAdmin = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <IconButton
-        icon={() => <Ionicons name="chevron-back" size={24} color="#fff" />}
+        icon={() => <Ionicons name="log-out-outline" size={24} color="#fff" />}
         size={24}
-        onPress={() => router.replace('/')}
-        style={styles.backButton}
+        onPress={handleLogout}
+        style={styles.logoutButton}
       />
       <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
         <View style={styles.fixedHeader}>
@@ -483,10 +487,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 8,
   },
-  backButton: {
+  logoutButton: {
     position: 'absolute',
     top: 20,
-    left: 16,
+    right: 16,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 20,
     zIndex: 1,
