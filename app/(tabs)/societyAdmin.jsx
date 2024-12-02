@@ -270,7 +270,7 @@ const SocietyAdmin = () => {
               imageUri={societyData.backgroundImage}
               setImageUri={(uri) => handleImageUpload(uri, 'backgroundImage')}
               editable={isEditable}
-              imagePath={`societies/${societyId}/backgroundImage`}
+              imagePath={`societies/backgroundImages/${societyId}`}
             />
           </View>
           <View style={styles.logoWrapper}>
@@ -279,7 +279,7 @@ const SocietyAdmin = () => {
                 imageUri={societyData.logo}
                 setImageUri={(uri) => handleImageUpload(uri, 'logo')}
                 editable={isEditable}
-                imagePath={`societies/${societyId}/logo`}
+                imagePath={`societies/logos/${societyId}`}
               />
             </View>
           </View>
