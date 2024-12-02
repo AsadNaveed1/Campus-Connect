@@ -179,8 +179,8 @@ const SocietyPage = () => {
 
   const renderMerch = () => (
     <View style={styles.merchContainer}>
-      {merch.map((item, index) => (
-        <View key={item.id} style={index % 2 === 0 ? styles.merchRow : null}>
+      {merch.map((item) => (
+        <View key={item.id} style={styles.merchItem}>
           <MerchCard 
             id={item.id}
             name={item.name} 
