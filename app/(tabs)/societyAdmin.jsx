@@ -6,8 +6,9 @@ import { useRouter } from 'expo-router';
 import { doc, onSnapshot, getDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { firebaseDB } from '../../firebaseConfig';
 import EventCard from '../../components/EventCard';
-import MerchCard from '../../components/MerchCard';
 import EditableImage from '../../components/EditableImage';
+import PostCard from '../../components/PostCard';
+import MerchCard from '../../components/MerchCard';
 
 const SocietyAdmin = () => {
   const theme = useTheme();
@@ -15,6 +16,7 @@ const SocietyAdmin = () => {
   const societyId = 'un3uYwBfO7O3nxqD67Xi';
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [merch, setMerch] = useState([]);
   const [categories, setCategories] = useState([]);
   const [societyData, setSocietyData] = useState({
@@ -45,6 +47,7 @@ const SocietyAdmin = () => {
         const data = doc.data();
         setSocietyData(data);
         fetchEventDetails(data.events);
+        fetchPostDetails(data.posts);
         fetchMerchDetails(data.merch);
       }
       setLoading(false);
@@ -58,9 +61,22 @@ const SocietyAdmin = () => {
         const eventPromises = eventIds.map(eventId => getDoc(doc(firebaseDB, 'events', eventId)));
         const eventDocs = await Promise.all(eventPromises);
         const eventData = eventDocs.map(eventDoc => ({ id: eventDoc.id, ...eventDoc.data() }));
+        eventData.sort((a, b) => a.time.seconds - b.time.seconds); // Sort events by date (oldest first)
         setEvents(eventData);
       } catch (error) {
         console.error('Error fetching event details:', error);
+      }
+    };
+
+    const fetchPostDetails = async (postIds) => {
+      try {
+        const postPromises = postIds.map(postId => getDoc(doc(firebaseDB, 'posts', postId)));
+        const postDocs = await Promise.all(postPromises);
+        const postData = postDocs.map(postDoc => ({ id: postDoc.id, ...postDoc.data() }));
+        postData.sort((a, b) => b.date.seconds - a.date.seconds); // Sort posts by date (newest first)
+        setPosts(postData);
+      } catch (error) {
+        console.error('Error fetching post details:', error);
       }
     };
 
@@ -69,6 +85,7 @@ const SocietyAdmin = () => {
         const merchPromises = merchIds.map(merchId => getDoc(doc(firebaseDB, 'merch', merchId)));
         const merchDocs = await Promise.all(merchPromises);
         const merchData = merchDocs.map(merchDoc => ({ id: merchDoc.id, ...merchDoc.data() }));
+        merchData.sort((a, b) => a.name.localeCompare(b.name)); // Sort merch by name
         setMerch(merchData);
       } catch (error) {
         console.error('Error fetching merch details:', error);
@@ -83,6 +100,14 @@ const SocietyAdmin = () => {
 
   const handleNewEventButton = () => {
     router.push({ pathname: '/eventAdmin', params: { societyId } });
+  };
+
+  const handleNewPostButton = () => {
+    router.push({ pathname: '/postAdmin', params: { societyId } });
+  };
+
+  const handleNewMerchButton = () => {
+    router.push({ pathname: '/merchAdmin', params: { societyId } });
   };
 
   const handleSave = async () => {
@@ -127,17 +152,43 @@ const SocietyAdmin = () => {
     </View>
   );
 
+  const renderPosts = () => (
+    <View style={styles.postsContainer}>
+      {posts.map(item => {
+        const currentDate = new Date();
+        const itemDate = new Date(item.date.seconds * 1000);
+        const isSameDate = currentDate.toDateString() === itemDate.toDateString();
+
+        const formattedDate = isSameDate
+          ? itemDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })
+          : itemDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        return (
+          <PostCard 
+            key={item.id} 
+            image={item.image} 
+            caption={item.caption} 
+            societyName={societyData.name}
+            date={formattedDate}
+            minimal
+          />
+        );
+      })}
+    </View>
+  );
+
   const renderMerch = () => (
     <View style={styles.merchContainer}>
-      {merch.map(item => (
-        <MerchCard
-          key={item.id}
-          id={item.id}
-          name={item.name}
-          price={item.price}
-          image={{ uri: item.image }}
-          societyId={societyId}
-        />
+      {merch.map((item, index) => (
+        <View key={item.id} style={index % 2 === 0 ? styles.merchRow : null}>
+          <MerchCard 
+            id={item.id}
+            name={item.name} 
+            price={item.price} 
+            image={{ uri: item.image }}
+            societyId={societyId}
+          />
+        </View>
       ))}
     </View>
   );
@@ -241,6 +292,12 @@ const SocietyAdmin = () => {
             <Text style={[styles.tabText, { color: activeTab === 'About' ? theme.colors.primary : theme.colors.onSurface }]}>About</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            style={[styles.tabButton, activeTab === 'Posts' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
+            onPress={() => setActiveTab('Posts')}
+          >
+            <Text style={[styles.tabText, { color: activeTab === 'Posts' ? theme.colors.primary : theme.colors.onSurface }]}>Posts</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={[styles.tabButton, activeTab === 'Events' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
             onPress={() => setActiveTab('Events')}
           >
@@ -254,6 +311,7 @@ const SocietyAdmin = () => {
           </TouchableOpacity>
         </View>
         {activeTab === 'About' && renderAbout()}
+        {activeTab === 'Posts' && renderPosts()}
         {activeTab === 'Events' && renderEvents()}
         {activeTab === 'Merch' && renderMerch()}
       </ScrollView>
@@ -266,6 +324,26 @@ const SocietyAdmin = () => {
             icon={() => <Ionicons name="add" size={24} color={theme.colors.onPrimary} />}
           >
             New Event
+          </Button>
+        )}
+        {activeTab === 'Posts' && (
+          <Button
+            mode="contained"
+            onPress={handleNewPostButton}
+            style={styles.newEventButton}
+            icon={() => <Ionicons name="add" size={24} color={theme.colors.onPrimary} />}
+          >
+            New Post
+          </Button>
+        )}
+        {activeTab === 'Merch' && (
+          <Button
+            mode="contained"
+            onPress={handleNewMerchButton}
+            style={styles.newEventButton}
+            icon={() => <Ionicons name="add" size={24} color={theme.colors.onPrimary} />}
+          >
+            New Merch
           </Button>
         )}
         {activeTab === 'About' && (
@@ -327,7 +405,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     marginVertical: 2,
-    width: '75%',
+    width: '90%',
     alignSelf: 'center',
   },
   tabButton: {
@@ -344,9 +422,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 16,
   },
+  postsContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
   merchContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingVertical: 16,
+  },
+  merchRow: {
+    flexDirection: 'row',
+    flex: 2,
+    width: '100%',
   },
   aboutContainer: {
     paddingHorizontal: 24,
