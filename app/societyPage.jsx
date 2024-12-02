@@ -3,7 +3,7 @@ import { View, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground,
 import { useTheme, Text, IconButton, Button, ActivityIndicator, Dialog, Portal } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { firebaseDB } from '../firebaseConfig';
 import EventCard from '../components/EventCard';
 import MerchCard from '../components/MerchCard';
@@ -20,6 +20,7 @@ const SocietyPage = () => {
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [merch, setMerch] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [qrVisible, setQrVisible] = useState(false);
 
   const screenWidth = Dimensions.get('window').width;
@@ -38,6 +39,7 @@ const SocietyPage = () => {
           setSocietyData(data);
           fetchEventDetails(data.events);
           fetchMerchDetails(data.merch);
+          fetchPosts();
           setLoading(false);
         }
       } catch (error) {
@@ -50,6 +52,7 @@ const SocietyPage = () => {
         const eventPromises = eventIds.map(eventId => getDoc(doc(firebaseDB, 'events', eventId)));
         const eventDocs = await Promise.all(eventPromises);
         const eventData = eventDocs.map(eventDoc => ({ id: eventDoc.id, ...eventDoc.data() }));
+        eventData.sort((a, b) => a.time.seconds - b.time.seconds);
         setEvents(eventData);
       } catch (error) {
         console.error('Error fetching event details:', error);
@@ -61,10 +64,24 @@ const SocietyPage = () => {
         const merchPromises = merchIds.map(merchId => getDoc(doc(firebaseDB, 'merch', merchId)));
         const merchDocs = await Promise.all(merchPromises);
         const merchData = merchDocs.map(merchDoc => ({ id: merchDoc.id, ...merchDoc.data() }));
+        merchData.sort((a, b) => a.name.localeCompare(b.name));
         setMerch(merchData);
       } catch (error) {
         console.error('Error fetching merch details:', error);
       }
+    };
+
+    const fetchPosts = () => {
+      const postsQuery = query(collection(firebaseDB, 'posts'), where('society', '==', societyId));
+      const unsubscribe = onSnapshot(postsQuery, (querySnapshot) => {
+        const postsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        postsData.sort((a, b) => b.date.seconds - a.date.seconds);
+        setPosts(postsData);
+      }, (error) => {
+        console.error('Error fetching posts:', error);
+      });
+
+      return () => unsubscribe();
     };
 
     if (societyId) {
@@ -87,28 +104,6 @@ const SocietyPage = () => {
       </View>
     );
   }
-
-  const posts = [
-    {id: 1, image: 'https://image.jimcdn.com/app/cms/image/transf/dimension=1190x10000:format=jpg/path/sa6549607c78f5c11/image/ia549b5935af7218d/version/1554203275/glastonbury-festival-best-summer-music-festivals.jpg',
-      caption: 'This is a wonderful moment captured during our recent society event. The energy and enthusiasm of our members were truly inspiring. We had a fantastic time engaging in various activities, sharing knowledge, and building lasting connections. The event was a testament to the vibrant community we have built together. Looking forward to many more such memorable moments with all of you. Stay tuned for more updates and events. #SocietyLife #Community #Events #Memories', 
-      numLikes: 106,
-    },
-    
-    { id: 2, image: 'https://www.anarapublishing.com/wp-content/uploads/elementor/thumbs/photo-1506157786151-b8491531f063-o67khcr8g8y3egfjh6eh010ougiroekqaq5cd8ly88.jpeg', 
-      caption: 'A great event by the community.',
-      numLikes: 92,
-    },
-
-    { id: 3, image: 'https://s1.it.atcdn.net/wp-content/uploads/2020/01/Hero-Holi-Festival-India-800x600.jpg', 
-      caption: 'Moments that matter.',
-      numLikes: 37,
-    },
-
-    { id: 4, image: 'https://www.discoverhongkong.com/content/dam/dhk/intl/explore/culture/mid-autumn-festival-traditions-festivities-and-delicacies/mid-autumn-festival-traditions-festivities-and-delicacies-1920x1080.jpg', 
-      caption: 'Stay connected, stay inspired!',
-      numLikes: 54,
-    },
-  ];
 
   const renderHeader = () => (
     <>
@@ -159,33 +154,42 @@ const SocietyPage = () => {
 
   const renderPosts = () => (
     <View style={styles.postsContainer}>
-      <View style={styles.postsRow}>
-        {posts.map(item => (
+      {posts.map(item => {
+        const currentDate = new Date();
+        const itemDate = new Date(item.date.seconds * 1000);
+        const isSameDate = currentDate.toDateString() === itemDate.toDateString();
+
+        const formattedDate = isSameDate
+          ? itemDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })
+          : itemDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        return (
           <PostCard 
             key={item.id} 
             image={item.image} 
             caption={item.caption} 
-            numLikes={item.numLikes}
+            societyName={societyData.name}
+            date={formattedDate}
+            minimal
           />
-        ))}
-      </View>
+        );
+      })}
     </View>
   );
 
-  const renderShop = () => (
-    <View style={styles.shopContainer}>
-      <View style={styles.shopRow}>
-        {merch.map(item => (
+  const renderMerch = () => (
+    <View style={styles.merchContainer}>
+      {merch.map((item, index) => (
+        <View key={item.id} style={index % 2 === 0 ? styles.merchRow : null}>
           <MerchCard 
-            key={item.id} 
             id={item.id}
             name={item.name} 
             price={item.price} 
             image={{ uri: item.image }}
             societyId={societyId}
           />
-        ))}
-      </View>
+        </View>
+      ))}
     </View>
   );
 
@@ -226,15 +230,15 @@ const SocietyPage = () => {
             <Text style={[styles.tabText, { color: activeTab === 'Events' ? theme.colors.primary : theme.colors.onSurface }]}>Events</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tabButton, activeTab === 'Shop' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
-            onPress={() => setActiveTab('Shop')}
+            style={[styles.tabButton, activeTab === 'Merch' && { ...styles.activeTab, borderColor: theme.colors.primary }]}
+            onPress={() => setActiveTab('Merch')}
           >
-            <Text style={[styles.tabText, { color: activeTab === 'Shop' ? theme.colors.primary : theme.colors.onSurface }]}>Shop</Text>
+            <Text style={[styles.tabText, { color: activeTab === 'Merch' ? theme.colors.primary : theme.colors.onSurface }]}>Merch</Text>
           </TouchableOpacity>
         </View>
 
         {activeTab === 'Posts' && renderPosts()}
-        {activeTab === 'Shop' && renderShop()}
+        {activeTab === 'Merch' && renderMerch()}
         {activeTab === 'Events' && renderEvents()}
       </ScrollView>
 
@@ -351,21 +355,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   postsContainer: {
-    padding: 0,
-  },
-  postsRow: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shopContainer: {
+    flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
-  shopRow: {
+  merchContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+  },
+  merchRow: {
+    flexDirection: 'row',
+    flex: 2,
+    width: '100%',
   },
   eventsContainer: {
     paddingHorizontal: 24,

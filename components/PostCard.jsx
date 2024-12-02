@@ -1,104 +1,94 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Text, useTheme } from 'react-native-paper';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import { useTheme } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
-const { width: screenWidth } = Dimensions.get('window');
-
-const PostCard = (props) => {
-  const { id, image, caption, numLikes } = props;
+const PostCard = ({ postId, caption, image, societyName, date, minimal, admin, societyId }) => {
   const theme = useTheme();
-  const [isHeartFilled, setIsHeartFilled] = useState(false);
-  const [likes, setLikes] = useState(numLikes);
-  const [isCaptionExpanded, setIsCaptionExpanded] = useState(false);
+  const router = useRouter();
+  const [expanded, setExpanded] = useState(false);
 
-  const toggleHeart = () => {
-    setIsHeartFilled(!isHeartFilled);
-    setLikes(isHeartFilled ? likes - 1 : likes + 1);
-  };
-
-  const toggleCaption = () => {
-    setIsCaptionExpanded(!isCaptionExpanded);
+  const handlePress = () => {
+    if (admin) {
+      router.push({ pathname: '/postAdmin', params: { societyId, postId } });
+    } else {
+      setExpanded(!expanded);
+    }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
-      <Image source={{ uri: image }} style={styles.image} />
-      
-      <View style={[styles.captionContainer, { color: theme.colors.onSurface }]}>
-        <TouchableOpacity onPress={toggleCaption} style={styles.captionWrapper}>
-          <Text
-            variant="bodyMedium"
-            style={[styles.caption, { color: theme.colors.onBackground }]}
-            numberOfLines={isCaptionExpanded ? 0 : 1}
-            ellipsizeMode="tail"
-          >
-            {caption}
-          </Text>
-        </TouchableOpacity>
-        <View style={styles.likesContainer}>
-          <TouchableOpacity style={styles.heartButton} onPress={toggleHeart}>
-            <Ionicons name={isHeartFilled ? "heart" : "heart-outline"} size={24} color="red" />
-          </TouchableOpacity>
-          <Text variant="bodyMedium" style={[styles.likes, { color: theme.colors.onBackground }]}>{likes}</Text>
+    <Pressable onPress={handlePress}>
+      {({ pressed }) => (
+        <View
+          style={[
+            styles.cardContainer,
+            { backgroundColor: pressed ? theme.colors.surfaceVariant : theme.colors.surface },
+          ]}
+        >
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: image }} style={styles.image} />
+          </View>
+          <View style={styles.detailsContainer}>
+            <View style={styles.headerContainer}>
+              <Text style={[styles.societyName, { color: theme.colors.onSurface }]} numberOfLines={1} ellipsizeMode="tail">
+                {!minimal && societyName}
+              </Text>
+              <Text style={[styles.date, { color: theme.colors.onSurfaceVariant }]}>
+                {date}
+              </Text>
+            </View>
+            <Text
+              style={[styles.caption, { color: theme.colors.onSurface }]}
+              numberOfLines={expanded ? undefined : 2}
+              ellipsizeMode="tail"
+            >
+              {caption}
+            </Text>
+          </View>
         </View>
-      </View>
-    </View>
+      )}
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    marginBottom: 16,
+  cardContainer: {
+    borderRadius: 10,
     overflow: 'hidden',
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
+    elevation: 2,
+    marginVertical: 10,
+    width: '100%',
+  },
+  imageContainer: {
+    position: 'relative',
   },
   image: {
     width: '100%',
-    height: 200,
-    marginBottom: 10,
+    height: 180,
   },
-  captionContainer: {
+  detailsContainer: {
+    padding: 10,
+  },
+  headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingLeft: 8,
-    paddingBottom: 8,
+    alignItems: 'center',
+    marginBottom: 5,
   },
-  captionWrapper: {
+  societyName: {
+    fontSize: 12,
+    fontWeight: 'bold',
     flex: 1,
-    paddingRight: 75, // Add padding to the right to create space for the likes icon
+  },
+  date: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 10,
   },
   caption: {
-    fontSize: 16,
-    textAlign: 'left',
-    paddingLeft: 8,
-  },
-  likesContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
-    right: 4,
-    top: -4,
-    // marginLeft: 8,
-    // paddingBottom: 8,
-
-  },
-  heartButton: {
-    marginLeft: 12,
-  },
-  likes: {
-    marginLeft: 4,
-    fontSize: 16,
-    paddingRight: 8,
-  },
-  imageSeparator: {
-    height: 1,
-    paddingTop: 0,
+    fontSize: 14,
+    marginBottom: 2,
+    textAlign: 'justify',
   },
 });
 
