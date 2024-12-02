@@ -25,7 +25,7 @@ const Index = () => {
   };
 
   const handleSocietySignIn = () => {
-    router.replace("/admin");
+    router.replace("/registerAdmin");
   };
 
   return (

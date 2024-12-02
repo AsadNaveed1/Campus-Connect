@@ -10,7 +10,6 @@ import { getAuth } from 'firebase/auth';
 import { firebaseDB } from '../firebaseConfig';
 import { useUserContext } from '../contexts/UserContext';
 import QRCode from 'react-native-qrcode-svg';
-import MapCard from '../components/MapCard';
 
 const { height: screenHeight } = Dimensions.get('window');
 
