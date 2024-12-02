@@ -142,6 +142,7 @@ const PostAdmin = () => {
             setImageUri={handleImageUpload}
             editable={!!postId && isEditable}
             imagePath={`posts/images/${postId}`}
+            text={true}
           />
           {!postId && (
             <View style={styles.overlay}>

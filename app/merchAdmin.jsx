@@ -131,6 +131,7 @@ const MerchAdmin = () => {
             setImageUri={handleImageUpload}
             editable={!!merchId && isEditable}
             imagePath={`merch/images/${merchId}`}
+            text={true}
           />
           {!merchId && (
             <View style={styles.overlay}>
