@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, ToastAndroid } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme, Text, IconButton } from "react-native-paper";
 import { doc, getDoc } from "firebase/firestore";
@@ -50,6 +50,11 @@ export default function Home() {
     fetchPosts();
   }, [user]);
 
+  const handleReload = () => {
+    ToastAndroid.show("Refreshed!", ToastAndroid.SHORT);
+    fetchPosts();
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View style={styles.header}>
@@ -59,7 +64,7 @@ export default function Home() {
         <IconButton
           icon="reload"
           size={24}
-          onPress={fetchPosts}
+          onPress={handleReload}
           style={{ marginRight: 0, marginTop: 8 }}
         />
       </View>
