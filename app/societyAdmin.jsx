@@ -2,18 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, ToastAndroid } from 'react-native';
 import { useTheme, Text, ActivityIndicator, Button, TextInput, Menu } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot, getDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { firebaseDB } from '../../firebaseConfig';
-import EventCard from '../../components/EventCard';
-import EditableImage from '../../components/EditableImage';
-import PostCard from '../../components/PostCard';
-import MerchCard from '../../components/MerchCard';
+import { firebaseDB } from '../firebaseConfig';
+import EventCard from '../components/EventCard';
+import EditableImage from '../components/EditableImage';
+import PostCard from '../components/PostCard';
+import MerchCard from '../components/MerchCard';
 
 const SocietyAdmin = () => {
   const theme = useTheme();
   const router = useRouter();
-  const societyId = 'un3uYwBfO7O3nxqD67Xi';
+  const { societyId } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [posts, setPosts] = useState([]);
