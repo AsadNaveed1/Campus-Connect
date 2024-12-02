@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, ScrollView, View, Image, StyleSheet, Dimensions } from 'react-native';
-import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
+import { Text, Button, IconButton, ActivityIndicator, Dialog, Portal } from 'react-native-paper';
 import { useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -9,6 +9,7 @@ import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firest
 import { getAuth } from 'firebase/auth';
 import { firebaseDB } from '../firebaseConfig';
 import { useUserContext } from '../contexts/UserContext';
+import QRCode from 'react-native-qrcode-svg';
 import MapCard from '../components/MapCard';
 
 const { height: screenHeight } = Dimensions.get('window');
@@ -24,6 +25,7 @@ const EventPage = () => {
   const [loading, setLoading] = useState(true);
   const [hasJoined, setHasJoined] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [qrVisible, setQrVisible] = useState(false);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -135,6 +137,10 @@ const EventPage = () => {
     router.back();
   };
 
+  const toggleQrDialog = () => {
+    setQrVisible(!qrVisible);
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
@@ -163,7 +169,15 @@ const EventPage = () => {
         </View>
         <View style={styles.detailsContainer}>
           <View style={styles.detailsHeader}>
-            <Text variant="titleLarge" style={[styles.title, { color: theme.colors.onSurface }]}>{eventData.name}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text variant="titleLarge" style={[styles.title, { color: theme.colors.onSurface }]}>{eventData.name}</Text>
+              <IconButton
+                icon={() => <Ionicons name="qr-code" size={16} color="grey" />}
+                size={18}
+                style={[styles.qrButton, { backgroundColor: 'rgba(128, 128, 128, 0.1)', borderRadius: 50, alignSelf: 'baseline' }]}
+                onPress={toggleQrDialog}
+              />
+            </View>
             <View style={[styles.feeBadge, { backgroundColor: theme.colors.surface }]}>
               <Text variant="bodyMedium" style={[styles.feeText, { color: theme.colors.onSurface, fontWeight: 'bold' }]}>${eventData.fee}</Text>
             </View>
@@ -189,12 +203,6 @@ const EventPage = () => {
             </Text>
           </View>
         </View>
-        {/* <MapCard
-          latitude={eventData?.latitude || 22.3193}
-          longitude={eventData?.longitude || 114.1694}
-          title={eventData?.name || ""}
-          description={eventData?.location || ""}
-        /> */}
       </ScrollView>
       <View style={styles.buttonContainer}>
         {hasJoined ? (
@@ -207,6 +215,19 @@ const EventPage = () => {
           </Button>
         )}
       </View>
+      <Portal>
+        <Dialog visible={qrVisible} onDismiss={toggleQrDialog} style={styles.qrDialog}>
+          <Dialog.Title>
+            <Text style={styles.qrDialogTitle}>Event Code</Text>
+          </Dialog.Title>
+          <Dialog.Content style={styles.qrDialogContent}>
+            <View>
+              <QRCode value={'eve:' + eventId} size={screenHeight * 0.3} />
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions></Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 };
@@ -317,6 +338,25 @@ const styles = StyleSheet.create({
   joinButton: {
     flex: 1,
     marginRight: 8,
+  },
+  qrButton: {
+    
+  },
+  qrDialog: {
+    borderRadius: 15,
+  },
+  qrDialogTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  qrDialogContent: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  qrDialogActions: {
+    justifyContent: 'center',
   },
 });
 
