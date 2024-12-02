@@ -125,7 +125,7 @@ const PostAdmin = () => {
   }
 
   const screenHeight = Dimensions.get('window').height;
-  const bannerHeight = screenHeight * 0.4;
+  const bannerHeight = screenHeight * 0.5;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -160,7 +160,7 @@ const PostAdmin = () => {
               theme={{ roundness: 15 }}
               editable={isEditable}
               multiline
-              numberOfLines={16}
+              numberOfLines={12}
               scrollEnabled={false}
             />
           </View>

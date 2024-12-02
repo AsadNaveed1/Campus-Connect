@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, Pressable, Animated } from 'react-native
 import { useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
-const MerchCard = ({ id, name, price, image, societyId }) => {
+const MerchCard = ({ id, name, price, image, societyId, admin }) => {
   const theme = useTheme();
   const router = useRouter();
   const scale = new Animated.Value(1);
@@ -23,7 +23,11 @@ const MerchCard = ({ id, name, price, image, societyId }) => {
   };
 
   const handlePress = () => {
-    router.push({ pathname: "/merchPage", params: { merchId: id, societyId } });
+    if (admin) {
+      router.push({ pathname: "/merchAdmin", params: { merchId: id, societyId } });
+    } else {
+      router.push({ pathname: "/merchPage", params: { merchId: id, societyId } });
+    }
   };
 
   return (
@@ -35,7 +39,7 @@ const MerchCard = ({ id, name, price, image, societyId }) => {
       >
         <Animated.View style={[styles.cardContainer, { backgroundColor: theme.colors.surface, transform: [{ scale }] }]}>
           <View style={styles.imageContainer}>
-            <Image source={ image } style={styles.image} />
+            <Image source={image} style={styles.image} />
             <View style={[styles.feeBadge, { backgroundColor: `${theme.colors.background}` }]}>
               <Text style={[styles.feeText, { color: theme.colors.onBackground }]}>{`$${price}`}</Text>
             </View>
@@ -79,7 +83,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   labelContainer: {
-    alignItems: 'flex-start', 
+    alignItems: 'flex-start',
     marginTop: 2,
     paddingHorizontal: 5,
     marginBottom: 10,

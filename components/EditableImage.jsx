@@ -6,7 +6,7 @@ import { useTheme, Dialog, Portal, Button, Text } from "react-native-paper";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { firebaseStorage } from "../firebaseConfig";
 
-const EditableImage = ({ imageUri, setImageUri, imagePath, editable }) => {
+const EditableImage = ({ imageUri, setImageUri, imagePath, editable, text }) => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const theme = useTheme();
 
@@ -91,12 +91,20 @@ const EditableImage = ({ imageUri, setImageUri, imagePath, editable }) => {
             <View style={styles.imageContainer}>
               <Image source={{ uri: imageUri }} style={styles.image} />
               <View style={styles.iconOverlay}>
-                <Ionicons name="pencil-outline" size={40} color={'white'} />
+                {text ? (
+                  <Text style={styles.overlayText}>Tap to edit</Text>
+                ) : (
+                  <Ionicons name="pencil-outline" size={40} color={'white'} />
+                )}
               </View>
             </View>
           ) : (
             <View style={styles.placeholder}>
-              <Ionicons name="add-outline" size={40} color={theme.colors.outline} />
+              {text ? (
+                <Text style={styles.overlayText}>Tap to edit</Text>
+              ) : (
+                <Ionicons name="add-outline" size={40} color={theme.colors.outline} />
+              )}
             </View>
           )}
         </Pressable>
@@ -106,7 +114,9 @@ const EditableImage = ({ imageUri, setImageUri, imagePath, editable }) => {
             <Image source={{ uri: imageUri }} style={styles.image} />
           ) : (
             <View style={styles.placeholder}>
-              <Ionicons name="camera-outline" size={40} color={theme.colors.outline} />
+              {!text &&
+                <Ionicons name="camera-outline" size={40} color={theme.colors.outline} />
+              }
             </View>
           )}
         </View>
@@ -178,6 +188,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+  },
+  overlayText: {
+    color: 'white',
+    fontSize: 14,
   },
 });
 

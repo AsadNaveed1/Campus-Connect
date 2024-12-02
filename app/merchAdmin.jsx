@@ -1,48 +1,37 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, ToastAndroid, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Text, TextInput, ActivityIndicator, useTheme, IconButton } from 'react-native-paper';
-import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
+import { Button, Text, TextInput, ActivityIndicator, useTheme, IconButton, Switch } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, getDoc, updateDoc, deleteDoc, addDoc, collection, Timestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, addDoc, collection, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { firebaseDB } from '../firebaseConfig';
 import EditableImage from '../components/EditableImage';
 
-const EventAdmin = () => {
-  const { eventId, societyId } = useLocalSearchParams();
+const MerchAdmin = () => {
+  const { merchId, societyId } = useLocalSearchParams();
   const theme = useTheme();
   const router = useRouter();
-  const [eventData, setEventData] = useState({
+  const [merchData, setMerchData] = useState({
     name: '',
     description: '',
-    fee: '',
-    time: '',
-    location: '',
-    backgroundImage: '',
+    price: '',
+    availability: true,
+    image: '',
     society: societyId || '',
   });
   const [loading, setLoading] = useState(true);
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
-  const [timePickerOpen, setTimePickerOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState({ hours: 0, minutes: 0 });
   const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
-    const fetchEventData = async () => {
-      if (eventId) {
+    const fetchMerchData = async () => {
+      if (merchId) {
         try {
-          const eventDoc = await getDoc(doc(firebaseDB, 'events', eventId));
-          if (eventDoc.exists()) {
-            const data = eventDoc.data();
-            setEventData(data);
-            if (data.time) {
-              const eventDate = data.time.toDate();
-              setSelectedDate(eventDate);
-              setSelectedTime({ hours: eventDate.getHours(), minutes: eventDate.getMinutes() });
-            }
+          const merchDoc = await getDoc(doc(firebaseDB, 'merch', merchId));
+          if (merchDoc.exists()) {
+            const data = merchDoc.data();
+            setMerchData(data);
           }
         } catch (error) {
         }
@@ -52,19 +41,15 @@ const EventAdmin = () => {
       setLoading(false);
     };
 
-    fetchEventData();
-  }, [eventId]);
+    fetchMerchData();
+  }, [merchId]);
 
   const handleSave = async () => {
     if (isEditable) {
       try {
-        const eventDocRef = doc(firebaseDB, 'events', eventId);
-        const updatedEventData = {
-          ...eventData,
-          time: Timestamp.fromDate(new Date(selectedDate.setHours(selectedTime.hours, selectedTime.minutes))),
-        };
-        await updateDoc(eventDocRef, updatedEventData);
-        ToastAndroid.show('Event updated', ToastAndroid.SHORT);
+        const merchDocRef = doc(firebaseDB, 'merch', merchId);
+        await updateDoc(merchDocRef, merchData);
+        ToastAndroid.show('Merch updated', ToastAndroid.SHORT);
       } catch (error) {
       }
     }
@@ -73,15 +58,11 @@ const EventAdmin = () => {
 
   const handleCreate = async () => {
     try {
-      const newEventData = {
-        ...eventData,
-        time: Timestamp.fromDate(new Date(selectedDate.setHours(selectedTime.hours, selectedTime.minutes))),
-      };
-      const eventDocRef = await addDoc(collection(firebaseDB, 'events'), newEventData);
+      const merchDocRef = await addDoc(collection(firebaseDB, 'merch'), merchData);
       await updateDoc(doc(firebaseDB, 'societies', societyId), {
-        events: arrayUnion(eventDocRef.id),
+        merch: arrayUnion(merchDocRef.id),
       });
-      ToastAndroid.show('Event created', ToastAndroid.SHORT);
+      ToastAndroid.show('Merch created', ToastAndroid.SHORT);
       router.back();
     } catch (error) {
     }
@@ -89,22 +70,22 @@ const EventAdmin = () => {
 
   const handleDelete = async () => {
     try {
-      if (eventId) {
-        const eventDocRef = doc(firebaseDB, 'events', eventId);
-        const eventDoc = await getDoc(eventDocRef);
-        if (eventDoc.exists()) {
-          const eventData = eventDoc.data();
-          if (eventData.backgroundImage) {
+      if (merchId) {
+        const merchDocRef = doc(firebaseDB, 'merch', merchId);
+        const merchDoc = await getDoc(merchDocRef);
+        if (merchDoc.exists()) {
+          const merchData = merchDoc.data();
+          if (merchData.image) {
             const storage = getStorage();
-            const imageRef = ref(storage, eventData.backgroundImage);
+            const imageRef = ref(storage, merchData.image);
             await deleteObject(imageRef);
           }
         }
-        await deleteDoc(eventDocRef);
+        await deleteDoc(merchDocRef);
         await updateDoc(doc(firebaseDB, 'societies', societyId), {
-          events: arrayRemove(eventId),
+          merch: arrayRemove(merchId),
         });
-        ToastAndroid.show('Event deleted', ToastAndroid.SHORT);
+        ToastAndroid.show('Merch deleted', ToastAndroid.SHORT);
         router.back();
       }
     } catch (error) {
@@ -113,9 +94,9 @@ const EventAdmin = () => {
 
   const handleImageUpload = async (uri) => {
     try {
-      const eventDocRef = doc(firebaseDB, 'events', eventId);
-      await updateDoc(eventDocRef, { backgroundImage: uri });
-      setEventData((prevData) => ({ ...prevData, backgroundImage: uri }));
+      const merchDocRef = doc(firebaseDB, 'merch', merchId);
+      await updateDoc(merchDocRef, { image: uri });
+      setMerchData((prevData) => ({ ...prevData, image: uri }));
     } catch (error) {
     }
   };
@@ -123,38 +104,6 @@ const EventAdmin = () => {
   const handleBackButton = () => {
     router.back();
   };
-
-  const onDismissSingle = useCallback(() => {
-    setDatePickerOpen(false);
-  }, [setDatePickerOpen]);
-
-  const onConfirmSingle = useCallback(
-    (params) => {
-      setDatePickerOpen(false);
-      setSelectedDate(params.date);
-      const updatedDate = new Date(params.date);
-      updatedDate.setHours(selectedTime.hours);
-      updatedDate.setMinutes(selectedTime.minutes);
-      setEventData((prevData) => ({ ...prevData, time: updatedDate.toISOString() }));
-    },
-    [selectedTime]
-  );
-
-  const onDismissTime = useCallback(() => {
-    setTimePickerOpen(false);
-  }, [setTimePickerOpen]);
-
-  const onConfirmTime = useCallback(
-    ({ hours, minutes }) => {
-      setTimePickerOpen(false);
-      setSelectedTime({ hours, minutes });
-      const updatedDate = new Date(selectedDate);
-      updatedDate.setHours(hours);
-      updatedDate.setMinutes(minutes);
-      setEventData((prevData) => ({ ...prevData, time: updatedDate.toISOString() }));
-    },
-    [selectedDate]
-  );
 
   if (loading) {
     return (
@@ -165,10 +114,7 @@ const EventAdmin = () => {
   }
 
   const screenHeight = Dimensions.get('window').height;
-  const bannerHeight = screenHeight * 0.4;
-
-  const eventDate = new Date(eventData.time);
-  const isValidDate = !isNaN(eventDate.getTime());
+  const bannerHeight = screenHeight * 0.5;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -181,14 +127,14 @@ const EventAdmin = () => {
         />
         <View style={[styles.bannerContainer, { height: bannerHeight }]}>
           <EditableImage
-            imageUri={eventData.backgroundImage}
+            imageUri={merchData.image}
             setImageUri={handleImageUpload}
-            editable={!!eventId && isEditable}
-            imagePath={`events/backgroundImages/${eventId}`}
+            editable={!!merchId && isEditable}
+            imagePath={`merch/images/${merchId}`}
           />
-          {!eventId && (
+          {!merchId && (
             <View style={styles.overlay}>
-              <Text style={styles.overlayText}>Image can be added after event creation.</Text>
+              <Text style={styles.overlayText}>Image can be added after merch creation.</Text>
             </View>
           )}
         </View>
@@ -197,9 +143,9 @@ const EventAdmin = () => {
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
               mode="outlined"
-              label="Event Name"
-              value={eventData.name}
-              onChangeText={(text) => setEventData({ ...eventData, name: text })}
+              label="Merch Name"
+              value={merchData.name}
+              onChangeText={(text) => setMerchData({ ...merchData, name: text })}
               theme={{ roundness: 15 }}
               editable={isEditable}
             />
@@ -207,8 +153,8 @@ const EventAdmin = () => {
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
               mode="outlined"
               label="Description"
-              value={eventData.description}
-              onChangeText={(text) => setEventData({ ...eventData, description: text })}
+              value={merchData.description}
+              onChangeText={(text) => setMerchData({ ...merchData, description: text })}
               multiline
               theme={{ roundness: 15 }}
               editable={isEditable}
@@ -216,50 +162,26 @@ const EventAdmin = () => {
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface }]}
               mode="outlined"
-              label="Fee"
-              value={eventData.fee.toString()}
-              onChangeText={(text) => setEventData({ ...eventData, fee: parseFloat(text) })}
+              label="Price"
+              value={merchData.price.toString()}
+              onChangeText={(text) => setMerchData({ ...merchData, price: parseFloat(text) })}
               keyboardType="numeric"
               theme={{ roundness: 15 }}
               editable={isEditable}
             />
-            <View style={styles.row}>
-              <Button onPress={() => setDatePickerOpen(true)} uppercase={false} mode="outlined" style={[styles.input, styles.halfInput]} disabled={!isEditable}>
-                Date
-              </Button>
-              <Button onPress={() => setTimePickerOpen(true)} uppercase={false} mode="outlined" style={[styles.input, styles.halfInput]} disabled={!isEditable}>
-                Time
-              </Button>
+            <View style={styles.switchContainer}>
+              <Text style={{ fontWeight: 'bold' }}>Available</Text>  
+              <Switch
+                value={merchData.availability}
+                onValueChange={(value) => setMerchData({ ...merchData, availability: value })}
+                disabled={!isEditable}
+              />
             </View>
-            <DatePickerModal
-              locale="en"
-              mode="single"
-              visible={datePickerOpen}
-              onDismiss={onDismissSingle}
-              date={isValidDate ? eventDate : new Date()}
-              onConfirm={onConfirmSingle}
-            />
-            <TimePickerModal
-              visible={timePickerOpen}
-              onDismiss={onDismissTime}
-              onConfirm={onConfirmTime}
-              hours={selectedTime.hours}
-              minutes={selectedTime.minutes}
-            />
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface }]}
-              mode="outlined"
-              label="Location"
-              value={eventData.location}
-              onChangeText={(text) => setEventData({ ...eventData, location: text })}
-              theme={{ roundness: 15 }}
-              editable={isEditable}
-            />
           </View>
         </View>
       </ScrollView>
       <View style={[styles.buttonRow, { backgroundColor: theme.colors.background }]}>
-        {eventId ? (
+        {merchId ? (
           <>
             <Button
               mode="contained"
@@ -367,6 +289,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 8,
+    padding: 8,
+  },
 });
 
-export default EventAdmin;
+export default MerchAdmin;

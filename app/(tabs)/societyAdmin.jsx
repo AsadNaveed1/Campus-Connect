@@ -186,10 +186,12 @@ const SocietyAdmin = () => {
         <View key={item.id} style={index % 2 === 0 ? styles.merchRow : null}>
           <MerchCard 
             id={item.id}
+            merchId={item.id}
             name={item.name} 
             price={item.price} 
             image={{ uri: item.image }}
             societyId={societyId}
+            admin={true}
           />
         </View>
       ))}
@@ -271,6 +273,7 @@ const SocietyAdmin = () => {
               setImageUri={(uri) => handleImageUpload(uri, 'backgroundImage')}
               editable={isEditable}
               imagePath={`societies/backgroundImages/${societyId}`}
+              text={true}
             />
           </View>
           <View style={styles.logoWrapper}>
