@@ -101,7 +101,7 @@ const EditableImage = ({ imageUri, setImageUri, imagePath, editable, text }) => 
           ) : (
             <View style={styles.placeholder}>
               {text ? (
-                <Text style={styles.overlayText}>Tap to edit</Text>
+                <Text style={styles.placeholderText}>Tap to edit</Text>
               ) : (
                 <Ionicons name="add-outline" size={40} color={theme.colors.outline} />
               )}
@@ -114,9 +114,11 @@ const EditableImage = ({ imageUri, setImageUri, imagePath, editable, text }) => 
             <Image source={{ uri: imageUri }} style={styles.image} />
           ) : (
             <View style={styles.placeholder}>
-              {!text &&
+              {!text ? (
                 <Ionicons name="camera-outline" size={40} color={theme.colors.outline} />
-              }
+              ) : (
+                <Text style={styles.placeholderText}>No image.</Text>
+              )}
             </View>
           )}
         </View>
@@ -155,6 +157,7 @@ const styles = StyleSheet.create({
     height: '100%',
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: 'lightgrey',
   },
   image: {
     flex: 1,
@@ -191,6 +194,10 @@ const styles = StyleSheet.create({
   },
   overlayText: {
     color: 'white',
+    fontSize: 14,
+  },
+  placeholderText: {
+    color: 'black',
     fontSize: 14,
   },
 });

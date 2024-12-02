@@ -185,7 +185,7 @@ const EventAdmin = () => {
             setImageUri={handleImageUpload}
             editable={!!eventId && isEditable}
             imagePath={`events/backgroundImages/${eventId}`}
-            text={true}
+            text={!!eventId}
           />
           {!eventId && (
             <View style={styles.overlay}>
