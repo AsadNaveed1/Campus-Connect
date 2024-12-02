@@ -1,27 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text, useTheme } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useUserContext } from "../contexts/UserContext";
 
 const Index = () => {
   const theme = useTheme();
   const router = useRouter();
-  const { user, setUser } = useUserContext();
-  const auth = getAuth();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        router.push("/home");
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth, router, setUser]);
+  const { user } = useUserContext();
 
   const handleUserSignIn = () => {
     router.push("/register");
@@ -30,10 +17,6 @@ const Index = () => {
   const handleSocietySignIn = () => {
     router.push("/admin");
   };
-
-  if (user) {
-    return null;
-  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>

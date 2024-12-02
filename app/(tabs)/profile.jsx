@@ -5,7 +5,7 @@ import { Button, Text, TextInput, useTheme, IconButton } from "react-native-pape
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useUserContext } from "../../contexts/UserContext";
 import { firebaseDB } from "../../firebaseConfig";
 import EditableImage from "../../components/EditableImage";
@@ -19,22 +19,32 @@ export default function Profile() {
   const [bio, setBio] = useState("");
   const [degree, setDegree] = useState("");
   const [major, setMajor] = useState("");
-  const [year, setYear] = useState("");
+  const [year, setYear] = useState(0);
   const [universityID, setUniversityID] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
   const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setName(user.name);
-      setBio(user.bio);
-      setDegree(user.degree);
-      setMajor(user.major);
-      setYear(user.year);
-      setUniversityID(user.universityID);
-      setProfilePicture(user.profilePicture);
-    }
-  }, [user]);
+    const fetchUserData = async () => {
+      if (user) {
+        const userDocRef = doc(firebaseDB, "users", auth.currentUser.email);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setName(userData.name);
+          setBio(userData.bio);
+          setDegree(userData.degree);
+          setMajor(userData.major);
+          setYear(Number(userData.year));
+          setUniversityID(userData.universityID);
+          setProfilePicture(userData.profilePicture);
+          setUser(userData);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -49,8 +59,7 @@ export default function Profile() {
 
   const handleUpdate = async () => {
     try {
-      const currentUser = auth.currentUser;
-      const userDocRef = doc(firebaseDB, "users", currentUser.email);
+      const userDocRef = doc(firebaseDB, "users", auth.currentUser.email);
       const updatedUserData = { name, bio, degree, major, year, universityID, profilePicture };
       await updateDoc(userDocRef, updatedUserData);
       setUser(updatedUserData);
@@ -124,8 +133,9 @@ export default function Profile() {
                         style={[styles.input, styles.smallInput, { backgroundColor: isEditable ? theme.colors.surface : 'transparent' }]}
                         mode="outlined"
                         label="Year"
-                        value={year}
-                        onChangeText={setYear}
+                        value={year.toString()}
+                        onChangeText={(text) => setYear(Number(text))}
+                        keyboardType="numeric"
                         placeholderTextColor={theme.colors.placeholder}
                         outlineColor={isEditable ? theme.colors.outline : 'transparent'}
                         theme={{ roundness: 15, colors: { background: 'transparent' } }}
