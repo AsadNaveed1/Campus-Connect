@@ -14,14 +14,14 @@ Campus Connect is an essential app for engaging with student societies and campu
 ## 📑 Table of Contents
 
 - [Screenshots](#screenshots)
-- [Features](#📱-features)
+- [Features](#-features)
   - [For Students](#for-students)
   - [For Society Admins](#for-society-admins)
-- [Getting Started](#🚀-getting-started)
-- [Testing the App](#📲-testing-the-app)
-- [Technologies Used](#🛠️-technologies-used)
+- [Getting Started](#-getting-started)
+- [Testing the App](#-testing-the-app)
+- [Technologies Used](#-technologies-used)
 - [Database Structure](#database-structure)
-- [License](#📄-license)
+- [License](#-license)
 
 ---
 
