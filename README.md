@@ -19,7 +19,7 @@ Campus Connect is an essential app for engaging with student societies and campu
   - [For Society Admins](#for-society-admins)
 - [Getting Started](#-getting-started)
 - [Testing the App](#-testing-the-app)
-- [Technologies Used](#-technologies-used)
+- [Technology Used](#-technology-used)
 - [Database Structure](#database-structure)
 - [License](#-license)
 
@@ -119,7 +119,7 @@ Campus Connect is an essential app for engaging with student societies and campu
 
 ---
 
-## 🛠️ Technologies Used
+## 🛠 Technology Stack
 
 - **React Native** - Mobile app framework
 - **Expo** - Development platform
