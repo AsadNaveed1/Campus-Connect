@@ -9,8 +9,11 @@
 
 Campus Connect is an essential app for engaging with student societies and campus life. It offers QR code scanning, customizable profiles, and easy event updates to enhance the university experience. Explore societies, shop for merch, and stay informed about events—all in one place!
 
+---
+
 ## 📑 Table of Contents
 
+- [Screenshots](#screenshots)
 - [Features](#📱-features)
   - [For Students](#for-students)
   - [For Society Admins](#for-society-admins)
@@ -19,6 +22,35 @@ Campus Connect is an essential app for engaging with student societies and campu
 - [Technologies Used](#🛠️-technologies-used)
 - [Database Structure](#database-structure)
 - [License](#📄-license)
+
+---
+
+## Screenshots
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <strong>Login</strong><br>
+      <img src="docs/images/Img1.png" alt="Login Screen" width="300">
+    </td>
+    <td align="center">
+      <strong>Home</strong><br>
+      <img src="docs/images/Img2.png" alt="Home Screen" width="300">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <strong>Societies</strong><br>
+      <img src="docs/images/Img3.png" alt="Societies Screen" width="300">
+    </td>
+    <td align="center">
+      <strong>Manage Society</strong><br>
+      <img src="docs/images/Img4.png" alt="Manage Society Screen" width="300">
+    </td>
+  </tr>
+</table>
+
+---
 
 ## 📱 Features
 
@@ -37,6 +69,8 @@ Campus Connect is an essential app for engaging with student societies and campu
 - **Post Publishing**: Share updates and announcements with members
 - **Merchandise Management**: Add and manage society merchandise listings
 
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -49,7 +83,7 @@ Campus Connect is an essential app for engaging with student societies and campu
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/AsadNaveed1/Campus-Connect.git
    cd campus-connect
    ```
 
@@ -69,6 +103,8 @@ Campus Connect is an essential app for engaging with student societies and campu
    - Open the **Expo Go** app on your Android device.  
    - Scan the QR code displayed in the terminal or the Expo web interface to load the app.  
 
+---
+
 ## 📲 Testing the App
 
 ### User Login
@@ -81,6 +117,7 @@ Campus Connect is an essential app for engaging with student societies and campu
 - **Password:** password
 - Note: Societies must be manually added to the Firebase database
 
+---
 
 ## 🛠️ Technologies Used
 
@@ -104,6 +141,8 @@ The app expects the following Firestore collections:
 - `posts` - Society posts
 - `merch` - Merchandise items
 - `categories` - Society categories
+
+---
 
 ## 📄 License
 
