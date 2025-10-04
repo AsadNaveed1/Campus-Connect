@@ -31,21 +31,21 @@ Campus Connect is an essential app for engaging with student societies and campu
   <tr>
     <td align="center">
       <strong>Login</strong><br>
-      <img src="docs/images/Img1.png" alt="Login Screen" width="300">
+      <img src="Docs/images/Img1.png" alt="Login Screen" width="300">
     </td>
     <td align="center">
       <strong>Home</strong><br>
-      <img src="docs/images/Img2.png" alt="Home Screen" width="300">
+      <img src="Docs/images/Img2.png" alt="Home Screen" width="300">
     </td>
   </tr>
   <tr>
     <td align="center">
       <strong>Societies</strong><br>
-      <img src="docs/images/Img3.png" alt="Societies Screen" width="300">
+      <img src="Docs/images/Img3.png" alt="Societies Screen" width="300">
     </td>
     <td align="center">
       <strong>Manage Society</strong><br>
-      <img src="docs/images/Img4.png" alt="Manage Society Screen" width="300">
+      <img src="Docs/images/Img4.png" alt="Manage Society Screen" width="300">
     </td>
   </tr>
 </table>
